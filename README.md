@@ -1,4 +1,4 @@
-  # FRONT-END do Aplicativo de Consumo do Liqua
+   # FRONT-END do Aplicativo de Consumo do Liqua
 
   Este projeto foi desenvolvido para fins educacionais por alunos do 3º ano do Novo Ensino Médio, no curso Técnico em Desenvolvimento de Sistemas do SESI/SENAI-DF.
 
@@ -23,6 +23,23 @@ O aplicativo consome uma API REST desenvolvida separadamente, responsável por:
 - persistência de dados
 - envio de e-mails de recuperação de senha
 
+## Arquitetura do Sistema (em ambiente de desenvolvimento padrão)
+```
+.
+├── app/            
+├── assets/         
+├── src/            
+│   ├── api/        
+│   ├── services/   
+│   ├── screens/    
+│   ├── components/ 
+│   └── navigation/ 
+├── app.json        
+├── package.json    
+├── tsconfig.json   
+
+```
+
 ## Principais Tecnologias Utilizadas
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
@@ -31,6 +48,5 @@ O aplicativo consome uma API REST desenvolvida separadamente, responsável por:
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 
 ![Expo](https://img.shields.io/badge/Expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white)
-
 
 
