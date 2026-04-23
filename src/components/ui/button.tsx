@@ -26,7 +26,7 @@ export function Button({
   // Lógica para determinar as propriedades do botão com base na variante selecionada
   const isOutLine = variant === "outline"; // Botões outline são botões secundarios, com cores invertidas
   const backgroundColor = isOutLine
-    ? "#FFFFFF"
+    ? theme.colors.background.secundary
     : theme.colors[variant === "primary" ? "primary" : "danger"].main; // Operador ternário para definir a cor de fundo do botão com base na variante selecionada
   const textColor = isOutLine // Operador ternário para definir a cor do texto do botão, invertendo as cores para botões outline
     ? theme.colors.text.secondary

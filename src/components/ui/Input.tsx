@@ -72,7 +72,7 @@ export const Input = forwardRef<TextInput, InputProps>(
           ? theme.colors.danger.main
           : isFocused
             ? theme.colors.primary.main
-            : theme.colors.text.primary,
+            : theme.colors.text.neutral,
       ], // Cor da label muda para vermelho se tiver erro, azul se estiver focado, ou a cor primária do texto caso contrário
     });
 
@@ -81,6 +81,7 @@ export const Input = forwardRef<TextInput, InputProps>(
         <View style={[styles.inputContainer, { borderColor }]}>
           {/*Label com animação*/}
           <Animated.Text
+            pointerEvents="none"
             style={[
               styles.label,
               {

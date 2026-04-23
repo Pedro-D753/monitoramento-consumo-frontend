@@ -6,9 +6,10 @@ export const theme = {
     //todas as cores recebem tipagem para string
     //isso existe para permitir que ela seja susbtituida por variaveis futuras
     background: {
-      primary: <string>'#696969', // O azul muito escuro do fundo das telas
+      primary: <string>'#696969',
+      secundary: <string>'#ffffff',  // O azul muito escuro do fundo das telas
       paper: <string>'#1A1F26',   // O fundo dos modais/cards mais claros
-      input: <string>'#ffffff',   // O fundo dos inputs e áreas de texto
+      input: <string>'#eee9e9',   // O fundo dos inputs e áreas de texto
     },
     // Cores de Cards e Pop-ups
     card: {
