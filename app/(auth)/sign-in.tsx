@@ -1,11 +1,13 @@
 //Importando modulos e libs globais
 import {
   Text,
+  StyleSheet,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormData, loginSchema } from "@/modules/auth/schemas/loginSchema";
 import { loginUser } from "@/modules/auth/services/authService";
+import { useRouter } from 'expo-router';
 import axios from 'axios';
 //Importando componentes e configs locais
 import { AuthLayout } from "@/components/layout/AuthLayout";
@@ -15,7 +17,8 @@ import { useState } from "react";
 import { theme } from '@/config/Theme';
 
 export default function SignInScreen() {
-  const [authError, setAuthError] = useState<string | null>(null);
+    const router = useRouter();
+    const [authError, setAuthError] = useState<string | null>(null);
 
   const {
     control,
@@ -44,15 +47,15 @@ export default function SignInScreen() {
   return (
     <AuthLayout
         footer={
-        <Button
-            title="Criar Conta"
-            variant="outline"
-            // onPress={TODO}
-        />
-    }
+            <Button
+                title="Criar Conta"
+                variant="outline"
+                onPress={() => router.push('/(auth)/sign-up/step-1')}
+            />
+        }
     >
 
-        <Text style={{color: theme.colors.text.primary, marginBottom: 15, marginTop: -10, fontSize: 16, fontWeight: 'bold'}}>Entre na sua conta</Text>
+        <Text style={styles.title}>Entre na sua conta</Text>
 
         
         <Controller
@@ -94,3 +97,13 @@ export default function SignInScreen() {
     </AuthLayout>
   )
 }
+
+const styles = StyleSheet.create({
+    title: {
+        color: theme.colors.text.primary,
+        marginBottom: 15,
+        marginTop: -10,
+        fontSize: 16,
+        fontWeight: 'bold',
+    }
+})

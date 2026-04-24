@@ -13,7 +13,6 @@
     "@expo/ngrok": "^4.1.0",
     "@hookform/resolvers": "^5.2.2",
     "axios": "^1.15.2",
-    "dotenv": "^17.4.2",
     "expo": "^55.0.17",
     "expo-constants": "~55.0.15",
     "expo-linking": "~55.0.14",

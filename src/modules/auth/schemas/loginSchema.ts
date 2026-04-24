@@ -12,7 +12,7 @@ export const loginSchema = z.object({
     password: z
     .string() // tipagem
     .min(1, 'Senha é obrigatória') // rejeita campo vazio
-    .min(6, 'A senha deve conter no mínimo 6 caracteres'), // regras de negocio para senha
+    .min(8, 'A senha deve conter no mínimo 8 caracteres'), // regras de negocio para senha
 });
 
 // O TypeScript extrai a tipagem automaticamente baseada no schema do Zod!
