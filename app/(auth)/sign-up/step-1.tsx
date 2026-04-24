@@ -7,13 +7,15 @@ import {
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SignUpStep1Data, signUpStep1Schema } from "@/modules/auth/schemas/signUpSchema";
 //Importando componentes e configs locais
+import { SignUpStep1Data, signUpStep1Schema } from "@/modules/auth/schemas/signUpSchema";
 import { useSignUp } from "@/modules/auth/context/SignUpContext";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { theme } from '@/config/Theme';
+import { Typography } from "@/components/ui/Typography";
+import { StepIndicator } from "@/components/ui/StepIndicator";
 
 export default function SignFistStep() {
 
@@ -38,13 +40,19 @@ export default function SignFistStep() {
         footer={
         <Button
             title="Entrar na sua Conta"
-            variant="primary"
+            variant="outline"
             onPress={() => router.push('/(auth)/sign-in')}
         />
-    }
+        }
+        header={
+            <View style={styles.card}>
+                <Typography variant="bold" size="md" style={styles.title2}>Bem-Vindo!</Typography>
+                <StepIndicator totalSteps={3} currentStep={1} />
+            </View>
+        }
     >
 
-        <Text style={styles.title}>Criando Conta</Text>
+            <Typography variant="medium" size="md" style={styles.title}>Preencha os campos abaixo</Typography>
 
             <Controller
                 control={control}
@@ -77,7 +85,7 @@ export default function SignFistStep() {
             <Button 
             title="Criar Conta" 
             onPress={handleSubmit(handleNextStep)}
-            variant='outline'
+            variant='primary'
             />
     </AuthLayout>
   )
@@ -85,10 +93,18 @@ export default function SignFistStep() {
 
 const styles = StyleSheet.create({
     title: {
-        color: theme.colors.text.primary,
         marginBottom: 15,
         marginTop: -10,
-        fontSize: 16,
-        fontWeight: 'bold',
+    },
+    title2: {
+        margin: theme.spacing.sm, 
+    },
+    card: {
+        backgroundColor: theme.colors.card.subCard,
+        borderRadius: theme.borderRadius.md,
+        width: "95%",
+        maxWidth: 400, // Limita a largura máxima para telas maiores
+        alignSelf: "center", // Centraliza horizontalmente
+        alignItems: "center", // Centraliza os itens dentro do card
     },
 })

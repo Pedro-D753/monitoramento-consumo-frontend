@@ -40,7 +40,7 @@ export function SignUpProvider({ children }: SignUpProviderProps) {
 export const useSignUp = (): SignUpContextData => {
     const context = useContext(SignUpContext);
     if (!context) {
-        throw new Error('useSignUp must be used within a SignUpProvider');
+        throw new Error('useSignUp precisa ser usado com o SignUpProvider');
     }
 
     return context;

@@ -5,9 +5,10 @@ import { theme } from '@/config/Theme';
 interface AuthLayoutProps {
     children: React.ReactNode; // Define a função de renderização para o conteúdo variável dentro do layout
     footer?: React.ReactNode;
+    header?: React.ReactNode;
 }
 
-export function AuthLayout({ children, footer }: AuthLayoutProps) {
+export function AuthLayout({ children, footer, header }: AuthLayoutProps) {
     return (
         <ImageBackground
                 resizeMode='cover'
@@ -20,6 +21,8 @@ export function AuthLayout({ children, footer }: AuthLayoutProps) {
                     style={styles.container}
                 >
                 <Image source={require('@/assets/liquaLogo.webp')} style={styles.logo} />
+                    {/*Barra auxilair para customização de telas*/}
+                    {header}
                     <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
                         {/* logo aqui */}
                         <View style={styles.card}>
@@ -73,8 +76,9 @@ const styles = StyleSheet.create({
         alignItems: "center", // Centraliza os itens dentro do card
     },
     logo: {
-        width: 300,
-        height: 300,
+        marginTop: theme.spacing.md,
+        width: 250,
+        height: 250,
         alignSelf: 'center',
     },
 })

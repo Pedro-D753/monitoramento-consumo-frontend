@@ -35,6 +35,20 @@ export const theme = {
     // Elementos de UI
     border: <string>'#2C3E50',
   },
+  // Tipografia
+  fonts: {
+    regular: 'Inter_400Regular',
+    medium: 'Inter_500Medium',
+    bold: 'Inter_700Bold',
+  },
+  fontSizes: {
+    xs: 12,
+    sm: 14,
+    md: 16, // Tamanho padrão para leitura
+    lg: 20,
+    xl: 24, // Para os títulos principais
+    xxl: 32,
+  },
   spacing: {
     xs: 4,
     sm: 8,
