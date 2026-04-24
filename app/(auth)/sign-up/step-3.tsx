@@ -114,5 +114,5 @@ const styles = StyleSheet.create({
         maxWidth: 200,
         textAlign: 'center',
         marginBottom: theme.spacing.sm,
-    }
+    },
 })

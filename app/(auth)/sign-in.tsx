@@ -88,7 +88,7 @@ export default function SignInScreen() {
             )}
         />
 
-        {authError && <Text>{authError}</Text>}
+        {authError && <Text style={styles.errorText}>{authError}</Text>}
 
         <Button 
         title="Entrar" 
@@ -105,5 +105,12 @@ const styles = StyleSheet.create({
         marginTop: -10,
         fontSize: 16,
         fontWeight: 'bold',
-    }
+    },
+    errorText: {
+        color: theme.colors.danger.main,
+        fontSize: 12,
+        maxWidth: 200,
+        textAlign: 'center',
+        marginBottom: theme.spacing.sm,
+    },
 })
