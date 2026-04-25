@@ -79,6 +79,7 @@ export default function SignThirdStep() {
         render={({ field }) => (
           <Input
             label="Senha"
+            autoCapitalize="none"
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}

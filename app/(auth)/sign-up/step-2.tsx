@@ -57,6 +57,7 @@ export default function SignSecondStep() {
         render={({ field }) => (
           <Input
             label="Nome de usuário"
+            autoCapitalize="none"
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -65,7 +66,7 @@ export default function SignSecondStep() {
           />
         )}
       />
-      <Button title="Continuar" onPress={handleSubmit(handleNextStep)} />
+      <Button title="Avançar" onPress={handleSubmit(handleNextStep)} />
     </AuthLayout>
   );
 }

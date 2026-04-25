@@ -41,7 +41,7 @@ export function Header({ userName = 'Usuário', tips = 'Continue se esforçando 
             {/* BASE: Dicas */}
             <View style={styles.tips}>
                 <Typography variant='bold' size='lg'>Dica do dia:</Typography>
-                <Typography variant='regular' size='md'>{tips}</Typography>
+                <Typography variant='regular' size='md' style={styles.tipText}>{tips}</Typography>
             </View>
             
         </View>
@@ -92,10 +92,13 @@ const styles = StyleSheet.create({
   tips: {
     // Como está num container do tipo column, ele vai se alinhar naturalmente à esquerda.
     backgroundColor: theme.colors.tools,
-    borderRadius: theme.borderRadius.sm, 
+    borderRadius: theme.borderRadius.xl, 
     alignItems: 'flex-start',
     alignSelf: 'center',
     width: '100%',
     paddingLeft: theme.spacing.sm,
+  },
+  tipText: {
+    margin: 5
   }
 });

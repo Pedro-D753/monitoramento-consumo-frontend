@@ -61,6 +61,7 @@ export default function SignFistStep() {
         render={({ field }) => (
           <Input
             label="E-mail"
+            autoCapitalize="none"
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -75,6 +76,7 @@ export default function SignFistStep() {
         render={({ field }) => (
           <Input
             label="Nome"
+            autoCapitalize="words"
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -84,7 +86,7 @@ export default function SignFistStep() {
         )}
       />
       <Button
-        title="Criar Conta"
+        title="Avançar"
         onPress={handleSubmit(handleNextStep)}
         variant="primary"
       />

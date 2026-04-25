@@ -7,6 +7,7 @@ import { loginUser } from "@/modules/auth/services/AuthService";
 import { useRouter } from "expo-router";
 import axios from "axios";
 //Importando componentes e configs locais
+import { useAuth } from '@/modules/auth/context/AuthContext';
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -16,6 +17,7 @@ import { Typography } from "@/components/ui/Typography";
 
 export default function SignInScreen() {
   const router = useRouter();
+  const { signIn } = useAuth();
   const [authError, setAuthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -27,25 +29,29 @@ export default function SignInScreen() {
     resolver: zodResolver(loginSchema), // Integração do Zod com React Hook Form para validação
   });
 
-  const handleLogin = async (data: LoginFormData) => {
+const handleLogin = async (data: LoginFormData) => {
     try {
-      setIsLoading(true);
-      const response = await loginUser(data);
-      // Aqui você pode armazenar o token usando AsyncStorage ou outra solução de armazenamento
-      console.log("Login bem-sucedido, token recebido:", response.access_token);
+        setIsLoading(true);
+        const response = await loginUser(data);
+        
+        await signIn(response.access_token, {
+            id: String(response.access_token), // temporário — substituir quando tiver endpoint /me
+            email: data.email,
+            name: data.email,
+        });
+
+        router.replace('/(app)');
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        // aqui error.response está tipado corretamente
-        const message =
-          error.response?.data?.detail || "Credenciais inválidas.";
-        setAuthError(message);
-      } else {
-        setAuthError("Ocorreu um erro inesperado.");
-      }
+        if (axios.isAxiosError(error)) {
+            const message = error.response?.data?.detail || 'Credenciais inválidas.';
+            setAuthError(message);
+        } else {
+            setAuthError('Ocorreu um erro inesperado.');
+        }
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
 
   return (
     <AuthLayout
@@ -67,6 +73,7 @@ export default function SignInScreen() {
         render={({ field }) => (
           <Input
             label="E-mail"
+            autoCapitalize="none"
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -81,6 +88,7 @@ export default function SignInScreen() {
         render={({ field }) => (
           <Input
             label="Senha"
+            autoCapitalize="none"
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
