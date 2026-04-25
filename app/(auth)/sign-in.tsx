@@ -40,17 +40,25 @@ const handleLogin = async (data: LoginFormData) => {
             name: data.email,
         });
 
-        router.replace('/(app)');
+        router.replace('/(app)/dashboard.tsx');
     } catch (error) {
-        if (axios.isAxiosError(error)) {
-            const message = error.response?.data?.detail || 'Credenciais inválidas.';
-            setAuthError(message);
-        } else {
-            setAuthError('Ocorreu um erro inesperado.');
-        }
-    } finally {
-        setIsLoading(false);
-    }
+      if (axios.isAxiosError(error)) {
+          const detail = error.response?.data?.detail;
+          
+          // Garante que a mensagem é sempre uma string
+          const message = typeof detail === 'string'
+              ? detail
+              : Array.isArray(detail)
+                  ? detail[0]?.msg || 'Credenciais inválidas.'
+                  : 'Credenciais inválidas.';
+          
+          setAuthError(message);
+      } else {
+          setAuthError('Ocorreu um erro inesperado.');
+      } 
+  } finally {
+      setIsLoading(false)
+  }
 };
 
   return (

@@ -1,6 +1,6 @@
 export const ENDPOINTS = {
     auth: {
-        login:          '/api/usuarios/login_usuario_token', // OAuth2 form
+        login:          '/api/usuarios/login_usuario', // OAuth2 form
         register:       '/api/usuarios/criar_usuario',
         refreshToken:   '/api/usuarios/regerar_token',       // query param
         userInfo:       '/api/usuarios/info_usuario_logado',

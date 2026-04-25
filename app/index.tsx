@@ -1,4 +1,4 @@
-/*
+
 import { Redirect } from 'expo-router';
 import { useAuth } from '@/modules/auth/context/AuthContext';
 import { View, ActivityIndicator } from 'react-native';
@@ -17,8 +17,8 @@ export default function RootIndex() {
 
     return <Redirect href={isAuthenticated ? '/(app)' : '/(auth)/sign-in'} />;
 }
-*/
 
+/*
 import { Redirect } from 'expo-router';
 
 export default function RootIndex() {
@@ -29,3 +29,4 @@ export default function RootIndex() {
   
   return <Redirect href="/(app)" />;
 }
+*/

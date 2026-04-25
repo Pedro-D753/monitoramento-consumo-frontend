@@ -13,9 +13,8 @@ interface LoginResponse {
 export const loginUser = async (
   data: LoginFormData,
 ): Promise<LoginResponse> => {
-  const formData = new URLSearchParams();
-  formData.append("username", data.email); // OAuth2 exige 'username', mas recebe o email
-  formData.append("password", data.password);
+  
+  const formData = `username=${encodeURIComponent(data.email)}&password=${encodeURIComponent(data.password)}`
 
   const response = await api.post<LoginResponse>(
     ENDPOINTS.auth.login,
