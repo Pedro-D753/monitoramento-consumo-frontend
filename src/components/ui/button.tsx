@@ -6,7 +6,8 @@ import {
   TouchableOpacityProps, // Classe de propriedades para TouchableOpacity
   ActivityIndicator, // Componente de carregamento para indicar que algo está em andamento
 } from "react-native";
-import { theme } from "@/config/Theme"; // Importa o tema para usar as cores e estilos definidos no seu projeto
+import { theme } from "@/config/Theme";
+ // Importa o tema para usar as cores e estilos definidos no seu projeto
 
 // Definindo as propriedades que o componente Button vai receber
 interface ButtonProps extends TouchableOpacityProps {

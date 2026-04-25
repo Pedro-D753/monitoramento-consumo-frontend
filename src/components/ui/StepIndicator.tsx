@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { theme } from '@/config/Theme';
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import { theme } from "@/config/Theme";
 
 // Definição da Interface (Contrato)
 interface StepIndicatorProps {
@@ -24,17 +24,19 @@ export function StepIndicator({ totalSteps, currentStep }: StepIndicatorProps) {
               style={[
                 styles.stepCircle,
                 isActive ? styles.activeCircle : styles.inactiveCircle,
-                isCurrent && styles.currentCircleHighlight
+                isCurrent && styles.currentCircleHighlight,
               ]}
             />
-            
+
             {/* Linha conectora entre os círculos (exceto após o último) */}
             {stepNumber < totalSteps && (
-              <View 
+              <View
                 style={[
                   styles.line,
-                  stepNumber < currentStep ? styles.activeLine : styles.inactiveLine
-                ]} 
+                  stepNumber < currentStep
+                    ? styles.activeLine
+                    : styles.inactiveLine,
+                ]}
               />
             )}
           </React.Fragment>
@@ -46,9 +48,9 @@ export function StepIndicator({ totalSteps, currentStep }: StepIndicatorProps) {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginVertical: theme.spacing.md,
   },
   stepCircle: {
@@ -62,7 +64,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.primary.main,
   },
   inactiveCircle: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderColor: theme.colors.border,
   },
   currentCircleHighlight: {

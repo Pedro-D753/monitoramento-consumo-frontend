@@ -22,14 +22,19 @@ interface InputProps extends TextInputProps {
 //pai para um componente filho, facilitando o acesso a elementos DOM ou componentes React diretamente
 //Estamos usando ele para permitir que o fomulario seja manipulado de maneira mais flexivel e rapida
 export const Input = forwardRef<TextInput, InputProps>(
-  ({ label, 
-    error, 
-    isPassword = false, 
-    value, 
-    style, 
-    onFocus, 
-    onBlur, 
-    ...rest }, ref) => {
+  (
+    {
+      label,
+      error,
+      isPassword = false,
+      value,
+      style,
+      onFocus,
+      onBlur,
+      ...rest
+    },
+    ref,
+  ) => {
     //Estados locais
     //Estados para controlar o foco do input e a visibilidade da senha
     const [isFocused, setIsFocused] = useState(false);
