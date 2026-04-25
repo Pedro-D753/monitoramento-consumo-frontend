@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { storage } from './Storage';
+import { router } from 'expo-router'
 
 export const api = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL, 
@@ -34,8 +35,10 @@ api.interceptors.response.use(
       // Aqui você lidará com a expiração do token. 
       // O ideal é limpar o token e redirecionar para a tela de login.
       await storage.removeToken();
-      // Nota: O redirecionamento pode ser gerido pelo contexto de autenticação 
-      // ou disparando um evento global.
+      if (router.canGoBack()) {
+          router.dismissAll();
+      }
+      router.replace('/(auth)/sign-in');
     }
     return Promise.reject(error);
   }

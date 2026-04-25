@@ -13,7 +13,7 @@ interface LoginResponse {
 export const loginUser = async (
   data: LoginFormData,
 ): Promise<LoginResponse> => {
-  
+
   const formData = `username=${encodeURIComponent(data.email)}&password=${encodeURIComponent(data.password)}`
 
   const response = await api.post<LoginResponse>(
@@ -23,11 +23,6 @@ export const loginUser = async (
   );
 
   const token = response.data.access_token;
-  
-  // Salva o token no SecureStore
-  if (token) {
-    await storage.saveToken(token);
-  }
 
   return response.data;
 };

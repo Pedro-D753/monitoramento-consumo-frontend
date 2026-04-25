@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { storage } from '@/config/Storage'
+import { api } from '@/config/Api'
+import { ENDPOINTS } from '@/config/Endpoints'
 
 interface User {
     id: string;
@@ -28,19 +30,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 const token = await storage.getToken();
 
                 if (token) {
-                    // CORREÇÃO 2: Respeitando a interface 'User'. 
-                    // TODO: Substituir no futuro por uma chamada à API (ex: api.get('/me')) 
-                    // ou decodificação do JWT para pegar os dados reais.
+                    // Como o token existe, o interceptor do Api.ts vai injetá-lo nesta chamada!
+                    const response = await api.get(ENDPOINTS.auth.userInfo);
+                    
+                    // Mapeia os dados reais vindos do backend
                     setUser({
-                        id: 'mock-id-temporario',
-                        email: 'usuario@liqua.com',
-                        name: 'Usuário'
+                        id: String(response.data.id),
+                        email: response.data.email,
+                        name: response.data.real_name || response.data.username
                     });
                 }
             } catch (error) {
-                console.error("Erro ao carregar dados do storage", error);
+                console.error("Erro ao validar sessão. O token pode estar expirado.", error);
+                // Se der erro 401 aqui, o interceptor já vai apagar o token e redirecionar
+                await storage.removeToken(); 
+                setUser(null);
             } finally {
-                // Garantimos que o loading termine mesmo se der erro no SecureStore
                 setIsLoading(false); 
             }
         }

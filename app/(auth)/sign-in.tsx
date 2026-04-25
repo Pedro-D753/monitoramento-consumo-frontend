@@ -40,7 +40,7 @@ const handleLogin = async (data: LoginFormData) => {
             name: data.email,
         });
 
-        router.replace('/(app)/dashboard.tsx');
+        router.replace('/(app)');
     } catch (error) {
       if (axios.isAxiosError(error)) {
           const detail = error.response?.data?.detail;
