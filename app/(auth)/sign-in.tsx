@@ -32,13 +32,16 @@ export default function SignInScreen() {
 const handleLogin = async (data: LoginFormData) => {
     try {
         setIsLoading(true);
+        setAuthError(null);
+
         const response = await loginUser(data);
         
-        await signIn(response.access_token, {
-            id: String(response.access_token), // temporário — substituir quando tiver endpoint /me
-            email: data.email,
-            name: data.email,
-        });
+        // ALERTA DE DEBUG:
+        if (!response.refresh_token) {
+            console.warn("SERVER REPORT: O FastAPI não enviou o refresh_token no payload de login!");
+        }
+
+        await signIn(response.access_token, response.refresh_token);
 
         router.replace('/(app)');
     } catch (error) {

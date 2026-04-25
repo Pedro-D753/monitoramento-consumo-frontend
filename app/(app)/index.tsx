@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
+import { BottomSheetModal } from '@/components/ui/BottomSheetModal';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { ActionCard } from '@/components/ui/ActionCard';
 import { Typography } from '@/components/ui/Typography';
 import { theme } from '@/config/Theme';
 
 export default function DashboardScreen() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   return (
     <>
       <PageLayout userName="User">
@@ -31,6 +33,7 @@ export default function DashboardScreen() {
           title="Registrar Consumo" 
           backgroundColor={theme.colors.cardButtons.leftUp} // Use suas cores do theme aqui (ex: theme.colors.warning)
           height={100} // Card menor em cima
+          onPress={() => setIsModalOpen(true)}
         />
         <ActionCard 
           title="Histórico" 
@@ -56,6 +59,16 @@ export default function DashboardScreen() {
       </View>
       </View>
       </PageLayout>
+      <BottomSheetModal
+        visible={isModalOpen}
+        onClose={() => setIsModalOpen(false)} // Função para fechar o modal
+        title="Novo Consumo"
+      >
+        {/* Aqui dentro vai o formulário no futuro. Por enquanto, só um texto de teste */}
+        <Typography variant="regular" size="md">
+          O formulário será renderizado aqui!
+        </Typography>
+      </BottomSheetModal>
     </>
   );
 }

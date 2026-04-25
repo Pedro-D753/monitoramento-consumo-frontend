@@ -31,6 +31,7 @@ export const theme = {
       primary: <string>'#FFFFFF', // Textos principais (Títulos, labels)
       secondary: <string>'#61ABD9', // Textos secundários ou placeholders
       neutral: <string>'#050505', // Textos neutros ou de baixo contraste
+      disabled: <string>'#a1a1a1'
     },
     cardButtons: {
       leftUp: <string>'#F2C14E',

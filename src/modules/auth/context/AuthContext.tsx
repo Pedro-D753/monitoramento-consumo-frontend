@@ -1,49 +1,36 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
-import { storage } from '@/config/Storage'
-import { api } from '@/config/Api'
-import { ENDPOINTS } from '@/config/Endpoints'
-
-interface User {
-    id: string;
-    email: string;
-    name: string;
-}
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { storage } from '@/config/Storage';
+import { getUserInfo, UserProfile } from '../services/AuthService';
 
 interface AuthContextData {
-    user: User | null;
+    user: UserProfile | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    signIn: (token: string, user: User) => Promise<void>;
+    // Agora o signIn recebe os dois tokens e nós mesmos buscamos o UserProfile
+    signIn: (accessToken: string, refreshToken: string) => Promise<void>;
     signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // CORREÇÃO 1: Removido o '>' extra no final
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<UserProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         async function loadStorageData() {
             try {
-                const token = await storage.getToken();
+                // ATUALIZAÇÃO: Buscando especificamente o Access Token
+                const token = await storage.getAccessToken();
 
                 if (token) {
-                    // Como o token existe, o interceptor do Api.ts vai injetá-lo nesta chamada!
-                    const response = await api.get(ENDPOINTS.auth.userInfo);
-                    
-                    // Mapeia os dados reais vindos do backend
-                    setUser({
-                        id: String(response.data.id),
-                        email: response.data.email,
-                        name: response.data.real_name || response.data.username
-                    });
+                    // Chamando o serviço centralizado em vez do axios direto aqui
+                    const profile = await getUserInfo();
+                    setUser(profile);
                 }
             } catch (error) {
-                console.error("Erro ao validar sessão. O token pode estar expirado.", error);
-                // Se der erro 401 aqui, o interceptor já vai apagar o token e redirecionar
-                await storage.removeToken(); 
+                console.error("Erro ao validar sessão na inicialização.", error);
+                await storage.removeTokens(); 
                 setUser(null);
             } finally {
                 setIsLoading(false); 
@@ -52,13 +39,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loadStorageData();
     }, []);
 
-    const signIn = async (token: string, userData: User) => {
-        await storage.saveToken(token);
-        setUser(userData);
+    const signIn = async (accessToken: string, refreshToken: string) => {
+        // 1. Salva AMBOS os tokens via SecureStore
+        await storage.saveTokens(accessToken, refreshToken);
+        
+        try {
+            // 2. Busca na API quem é o dono desse token recém-salvo
+            const profile = await getUserInfo();
+            setUser(profile);
+        } catch (error) {
+            console.error("Falha ao puxar info do usuário logo após login.", error);
+            await storage.removeTokens();
+            throw new Error("Sessão criada, mas falha ao carregar perfil.");
+        }
     };
 
     const signOut = async () => {
-        await storage.removeToken();
+        // ATUALIZAÇÃO: removeTokens plural, para limpar Access e Refresh
+        await storage.removeTokens();
         setUser(null);
     };
 
@@ -77,6 +75,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export function useAuth() {
     const context = useContext(AuthContext);
-    if(!context) throw new Error('useAuth precisa estar com um AuthProvider')
-    return context
+    if(!context) throw new Error('useAuth precisa estar com um AuthProvider');
+    return context;
 }
