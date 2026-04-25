@@ -6,7 +6,7 @@ export const theme = {
     //todas as cores recebem tipagem para string
     //isso existe para permitir que ela seja susbtituida por variaveis futuras
     background: {
-      primary: <string>'#696969',
+      primary: <string>'#394653',
       secondary: <string>'#ffffff',  // O azul muito escuro do fundo das telas
       paper: <string>'#1A1F26',   // O fundo dos modais/cards mais claros
       input: <string>'#eee9e9',   // O fundo dos inputs e áreas de texto
@@ -19,8 +19,8 @@ export const theme = {
     },
     // Cores de Marca/Ação
     primary: {
-      main: <string>'#4D59DE',    // O azul claro dos botões "Entrar"
-      light: <string>'#28A18D',   // O verde água usado no logo e detalhes
+      main: <string>'#4F5DED',    // O azul claro dos botões "Entrar"
+      light: <string>'#2E9E8C',   // O verde água usado no logo e detalhes
     },
     // Cores de Feedback (Erros, Sucesso)
     danger: {
@@ -32,8 +32,15 @@ export const theme = {
       secondary: <string>'#61ABD9', // Textos secundários ou placeholders
       neutral: <string>'#050505', // Textos neutros ou de baixo contraste
     },
+    cardButtons: {
+      leftUp: <string>'#F2C14E',
+      leftDown: <string>'#4F5DED',
+      rightUp: <string>'#2E9E8C',
+      rightDown: <string>'#6D6D6D',
+    },
     // Elementos de UI
     border: <string>'#2C3E50',
+    tools: <string>'#585555'
   },
   // Tipografia
   fonts: {
@@ -50,6 +57,7 @@ export const theme = {
     xxl: 32,
   },
   spacing: {
+    minusSM: -8,
     xs: 4,
     sm: 8,
     md: 16,

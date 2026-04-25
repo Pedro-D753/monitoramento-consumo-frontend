@@ -1,7 +1,8 @@
-import api from "@/config/Api";
+import { api } from "@/config/Api";
 import { LoginFormData } from "../schemas/LoginSchema";
 import { SignUpData } from "../schemas/SignUpSchema";
 import { ENDPOINTS } from "@/config/Endpoints";
+import { storage } from "@/config/Storage";
 
 interface LoginResponse {
   access_token: string;
@@ -21,6 +22,14 @@ export const loginUser = async (
     formData,
     { headers: { "Content-Type": "application/x-www-form-urlencoded" } },
   );
+
+  const token = response.data.access_token;
+  
+  // Salva o token no SecureStore
+  if (token) {
+    await storage.saveToken(token);
+  }
+
   return response.data;
 };
 
@@ -36,8 +45,7 @@ export const registerUser = async (
   data: SignUpData,
 ): Promise<RegisterResponse> => {
   const response = await api.post<RegisterResponse>(
-    "/api/Usuario/criar_usuario",
-    data,
+    ENDPOINTS.auth.register, data
   );
   return response.data;
 };
