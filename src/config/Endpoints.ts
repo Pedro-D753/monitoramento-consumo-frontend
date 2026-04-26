@@ -8,7 +8,7 @@ export const ENDPOINTS = {
     editUser: "/api/usuarios/editar_usuario",
     deleteUser: "/api/usuarios/deletar_usuario",
     forgotPassword: "/api/usuarios/esqueci_a_senha",
-    resetPassword: "/api/usuarios/recuperar_senha",
+    resetPassword: "/api/usuarios/redefinir_senha",
   },
   consumos: {
     criar: "/api/consumos/criar_consumo",
