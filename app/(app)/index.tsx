@@ -35,7 +35,10 @@ export default function DashboardScreen() {
       .reduce((acc, item) => acc + item.value, 0);
   }, [rawData]);
 
-  const formattedTotal = `R$ ${currentMonthTotal.toFixed(2).replace('.', ',')}`;
+    const formattedTotal = currentMonthTotal.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
 
   const handleSuccess = () => {
     setModalType(null);

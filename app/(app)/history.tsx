@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useRouter } from 'expo-router';
+import { Feather } from '@expo/vector-icons'
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Typography } from '@/components/ui/Typography';
@@ -26,6 +28,7 @@ const UNIT_OPTIONS = [
 ];
 
 export default function HistoryScreen() {
+  const router = useRouter();
   const { data, rawData, isLoading, error, applyLocalFilters, refetch } =
     useConsumptionHistory();
 
@@ -64,26 +67,35 @@ export default function HistoryScreen() {
   const handleDelete = async (id: number) => {
     try {
       await deleteConsumo('real', id);
-      applyLocalFilters({}); // Força re-render local
-      refetch();             // Sincroniza com backend
+      // Aguarda os dados novos do banco
+      await refetch();             
+      // Reaplica a configuração exata de filtros que o usuário está vendo na tela
+      handleApplyFilters(); 
     } catch {
       // Erro silencioso — o card já reverteu o estado de confirmação
     }
   };
 
-  const handleEditSuccess = () => {
-    setEditingRecord(null);
-    refetch();
+  const handleEditSuccess = async () => {
+    setEditingRecord(null); // Fecha o modal de edição
+    await refetch();        // Espera os dados novos e atualizados chegarem do backend
+    handleApplyFilters();   // Lê os filtros que estão na tela (Data/Unidade) e corta a lista novamente
   };
 
   return (
     <>
       <PageLayout showHeader={false}>
-        <View style={styles.header}>
+        <View>
+          <TouchableOpacity 
+            onPress={() => router.back()} 
+            style={styles.backButton}
+            activeOpacity={0.7}
+          >
+            <Feather name="arrow-left" size={24} color={theme.colors.text.primary} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.headerContainer}>
           <Typography variant="bold" size="xl">Histórico Completo</Typography>
-          <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>
-            Acompanhe e filtre seus registros
-          </Typography>
         </View>
 
         <View style={styles.chartArea}>
@@ -211,7 +223,22 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { marginBottom: theme.spacing.lg },
+  headerContainer: {
+    alignItems: 'flex-start',
+    marginTop: theme.spacing.sm,
+    marginBottom: theme.spacing.md
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.gray[900],
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
   chartArea: { marginBottom: theme.spacing.lg },
   chartHeader: {
     flexDirection: 'row',

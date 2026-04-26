@@ -24,9 +24,14 @@ export const signUpStep3Schema = z.object({
         .regex(/[A-Z]/, 'A senha deve conter ao menos uma letra maiúscula')
         .regex(/[0-9]/, 'A senha deve conter ao menos um número')
         .regex(/[!@#$%&*?]/, 'A senha deve conter ao menos um caractere especial (!@#$%&*?)'),
+        confirm_password: z.string().min(1, 'A confirmação de senha é obrigatória'),
+    })
+    .refine((data) => data.password === data.confirm_password, {
+        path: ['confirm_password'],
+        message: 'As senhas não coincidem.',
 });
 
 export type SignUpStep1Data = z.infer<typeof signUpStep1Schema>
 export type SignUpStep2Data = z.infer<typeof signUpStep2Schema>
 export type SignUpStep3Data = z.infer<typeof signUpStep3Schema>
-export type SignUpData = SignUpStep1Data & SignUpStep2Data & SignUpStep3Data
+export type SignUpData = SignUpStep1Data & SignUpStep2Data & { password: string }

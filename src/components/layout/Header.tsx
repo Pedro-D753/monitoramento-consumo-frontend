@@ -45,8 +45,10 @@ export function Header({ userName = 'Usuário'}: HeaderProps) {
             </View>
 
             <View style={styles.tips}>
-                <Typography variant='bold' size='lg'>Dica do dia:</Typography>
-                <Typography variant='regular' size='sm' style={styles.tipText}>{tip}</Typography>
+                <Typography variant='bold' size='md'>Dica do dia:</Typography>
+                <Typography variant='regular' size='sm' style={styles.tipText}>
+                  {tip}
+                </Typography>
             </View>
             
         </View>
@@ -55,18 +57,19 @@ export function Header({ userName = 'Usuário'}: HeaderProps) {
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'space-between',
     alignSelf: 'center',
     padding: theme.spacing.md,
     backgroundColor: theme.colors.card.infoCard,
     borderRadius: theme.borderRadius.lg,
-    height: 200,
-    width: '90%'
+    width: '90%',
+    // NOVA SOLUÇÃO: Em vez de altura fixa, o gap garante a distância exata 
+    // entre os dados do usuário e a caixa de dica. O container vai esticar sozinho.
+    gap: theme.spacing.lg, 
   },
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center', // Centraliza o botão de config com a foto verticalmente
     width: '100%',
   },
   userInfo: {
@@ -96,11 +99,11 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.tools,
     borderRadius: theme.borderRadius.xl, 
     alignItems: 'flex-start',
-    alignSelf: 'center',
     width: '100%',
-    paddingLeft: theme.spacing.sm,
+    padding: theme.spacing.md, // Adicionado padding uniforme interno na caixinha
   },
   tipText: {
-    margin: 5
+    marginTop: theme.spacing.xs, // Descola a dica do título
+    lineHeight: 20, // Melhora a leitura de textos muito longos
   }
 });
