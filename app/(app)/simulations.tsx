@@ -3,6 +3,8 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 
+import { SimulationLineChart } from '@/components/ui/SimulationLineChart';
+import { ChartDataPoint } from '@/modules/consumos/schemas/ConsumptionSchema';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Typography } from '@/components/ui/Typography';
 import { theme } from '@/config/Theme';
@@ -24,6 +26,21 @@ export default function SimulationsScreen() {
     return totalValue / diffDays;
   };
 
+  const formatChartData = (): ChartDataPoint[] => {
+    // Ordena por data e mapeia para o formato do gráfico
+    return [...simulations]
+      .sort((a, b) => parseApiDate(a.starting_date).getTime() - parseApiDate(b.starting_date).getTime())
+      .map(sim => {
+        const date = parseApiDate(sim.starting_date);
+        const monthLabel = date.toLocaleString('pt-BR', { month: 'short' }).replace('.', '');
+        return {
+          value: sim.value,
+          label: `${monthLabel}/${String(date.getFullYear()).slice(-2)}`,
+          frontColor: theme.colors.primary.main // <--- Correção aqui: satisfaz a interface
+        };
+      });
+  };
+
   return (
     <PageLayout showHeader={false}>
       <View style={styles.headerContainer}>
@@ -34,6 +51,13 @@ export default function SimulationsScreen() {
           </Typography>
         </View>
       </View>
+
+      <View style={{ marginBottom: theme.spacing.lg }}>
+          <SimulationLineChart 
+            data={formatChartData()} 
+            isLoading={isLoading} 
+          />
+        </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         

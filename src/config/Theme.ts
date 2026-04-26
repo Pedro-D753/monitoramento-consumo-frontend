@@ -14,6 +14,7 @@ export const theme = {
     primary: {
       main: <string>'#4F5DED',
       light: <string>'#2E9E8C',
+      blue: <string>'#31a7dd'
     },
     danger: {
       main: <string>'#B42525',

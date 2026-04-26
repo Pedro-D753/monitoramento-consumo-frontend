@@ -1,8 +1,9 @@
 import { api } from "@/config/Api";
+import { useRouter } from "expo-router";
 import { ENDPOINTS } from "@/config/Endpoints";
 import { LoginFormData } from "../schemas/LoginSchema";
 import { SignUpData } from "../schemas/SignUpSchema";
-
+const router = useRouter();
 export interface LoginResponse {
   access_token: string;
   refresh_token: string;
@@ -86,7 +87,7 @@ export const resetPassword = async (
 };
 
 export const deleteUser = async (refreshToken: string): Promise<void> => {
-  await api.delete(ENDPOINTS.auth.deleteUser, {
-    data: { refresh_token: refreshToken },
+    await api.delete(ENDPOINTS.auth.deleteUser, {
+      data: { refresh_token: refreshToken },
   });
 };

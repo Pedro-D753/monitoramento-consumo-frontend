@@ -75,7 +75,6 @@ export default function ProfileScreen() {
       if (!refreshToken) throw new Error("Sessão inválida.");
       await deleteUser(refreshToken);
       await signOut();
-      router.replace("/(auth)/sign-in");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const detail = error.response?.data?.detail;

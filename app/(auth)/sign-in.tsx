@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
@@ -106,6 +106,14 @@ export default function SignInScreen() {
           />
         )}
       />
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => router.push('/(auth)/forgot-password')}
+      >
+        <Typography style={styles.password} variant="regular" size={'xs'}>
+          Esqueci minha senha
+        </Typography>
+      </TouchableOpacity>
 
       {authError && (
         <Typography variant="regular" size="xl" style={styles.errorText}>
@@ -134,5 +142,10 @@ const styles = StyleSheet.create({
     maxWidth: 200,
     textAlign: "center",
     marginBottom: theme.spacing.sm,
+  },
+  password: {
+    marginBottom: 15,
+    padding: 5,
+    color: theme.colors.primary.blue
   },
 });

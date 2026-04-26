@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
+import { useFocusEffect } from "expo-router";
 import axios from "axios";
 import { theme } from "@/config/Theme";
 import {
@@ -129,7 +130,10 @@ const fetchHistory = useCallback(async () => {
       // Os filtros são aplicados localmente sobre o cache já carregado da API.
       let result = [...cachedData];
       if (filters.si_measurement_unit) {
-        result = result.filter((i) => i.si_measurement_unit === filters.si_measurement_unit);
+        const targetUnit = filters.si_measurement_unit.trim().toLowerCase();
+        result = result.filter(
+          (i) => i.si_measurement_unit.trim().toLowerCase() === targetUnit
+        );
       }
       if (filters.starting_date) {
         const start = parseApiDate(filters.starting_date).getTime();
@@ -155,9 +159,11 @@ const fetchHistory = useCallback(async () => {
     [cachedData],
   );
 
-  useEffect(() => {
-    fetchHistory();
-  }, [fetchHistory]);
+useFocusEffect(
+    useCallback(() => {
+      fetchHistory();
+    }, [fetchHistory])
+  );
 
   return {
     data: chartData,

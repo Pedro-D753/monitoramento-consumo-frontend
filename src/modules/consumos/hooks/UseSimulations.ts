@@ -1,6 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { useFocusEffect } from "expo-router";
 import { ConsumptionRecord } from '../schemas/ConsumptionSchema';
-import { getConsumos } from '../services/ConsumptionService';
+import { 
+  getConsumos, 
+  deleteConsumo, 
+  editConsumo, 
+  EditConsumptionPayload 
+} from '../services/ConsumptionService';
 
 export function useSimulations() {
   const [simulations, setSimulations] = useState<ConsumptionRecord[]>([]);
@@ -19,10 +25,39 @@ export function useSimulations() {
       setIsLoading(false);
     }
   }, []);
+  const removeSimulation = async (id: number) => {
+    try {
+      await deleteConsumo("simulation", id);
+      // Atualização otimista ou refetch
+      setSimulations(prev => prev.filter(sim => sim.id !== id));
+    } catch (error) {
+      console.error("Erro ao deletar simulação", error);
+      throw error;
+    }
+  };
 
-  useEffect(() => {
-    fetchSimulations();
-  }, [fetchSimulations]);
+  const updateSimulation = async (id: number, payload: EditConsumptionPayload) => {
+    try {
+      const updated = await editConsumo("simulation", id, payload);
+      setSimulations(prev => prev.map(sim => sim.id === id ? updated : sim));
+      return updated;
+    } catch (error) {
+      console.error("Erro ao editar simulação", error);
+      throw error;
+    }
+  };
 
-  return { simulations, isLoading, refetchSimulations: fetchSimulations };
+  useFocusEffect(
+    useCallback(() => {
+      fetchSimulations();
+    }, [fetchSimulations])
+  );
+
+  return { 
+    simulations, 
+    isLoading, 
+    refetchSimulations: fetchSimulations,
+    removeSimulation, // <--- Exportar
+    updateSimulation  // <--- Exportar
+  };
 }

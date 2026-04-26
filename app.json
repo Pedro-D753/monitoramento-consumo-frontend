@@ -11,11 +11,11 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./src/assets/liquaLogo.webp",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
-      "image": "./src/assets/splash-icon.png",
+      "image": "./src/assets/liquaLogo.webp",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
