@@ -28,6 +28,11 @@
               "scheme": "https",
               "host": "app.liquamonitor.dev",
               "pathPrefix": "/reset-password"
+            },
+            {
+              "scheme": "https",
+              "host": "frontend.liquamonitor.dev",
+              "pathPrefix": "/reset-password"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]
