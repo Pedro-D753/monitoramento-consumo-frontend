@@ -10,7 +10,7 @@ export interface ConsumptionRecord {
 }
 
 export interface ConsumptionFilters {
-  measurement_unit?: string;
+  si_measurement_unit?: string; 
   starting_date?: string;
   ending_date?: string;
   minimum_value?: number;

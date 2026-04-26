@@ -26,7 +26,7 @@ export default function DashboardScreen() {
 
     return rawData
       .filter((item) => {
-        const isMoney = item.si_measurement_unit.toUpperCase() === 'r$';
+        const isMoney = item.si_measurement_unit.toLowerCase() === 'r$';
         const itemDate = parseApiDate(item.ending_date);
         const isThisMonth = itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
         

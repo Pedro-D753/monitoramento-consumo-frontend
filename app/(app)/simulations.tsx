@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: theme.spacing.md,
-    backgroundColor: theme.colors.background.input, 
+    backgroundColor: theme.colors.primary.main, 
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
