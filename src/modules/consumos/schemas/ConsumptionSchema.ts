@@ -4,7 +4,7 @@ export interface ConsumptionRecord {
   id: number;
   starting_date: string;
   ending_date: string;
-  measurement_unit: string;
+  si_measurement_unit: string;
   value: number;
   description?: string;
 }

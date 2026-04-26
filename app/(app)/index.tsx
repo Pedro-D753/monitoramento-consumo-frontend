@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useRouter } from 'expo-router';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet} from 'react-native';
 
 import { PageLayout } from '@/components/layout/PageLayout';
 import { BottomSheetModal } from '@/components/ui/BottomSheetModal';
@@ -26,7 +26,7 @@ export default function DashboardScreen() {
 
     return rawData
       .filter((item) => {
-        const isMoney = item.measurement_unit.toUpperCase() === 'r$';
+        const isMoney = item.si_measurement_unit.toUpperCase() === 'r$';
         const itemDate = parseApiDate(item.ending_date);
         const isThisMonth = itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
         

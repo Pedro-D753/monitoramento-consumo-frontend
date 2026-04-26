@@ -43,7 +43,7 @@ export function EditConsumptionForm({ type, record, onSuccess, onCancel }: Props
     defaultValues: {
       starting_date: parseApiDate(record.starting_date),
       ending_date: parseApiDate(record.ending_date),
-      si_measurement_unit: record.measurement_unit,
+      si_measurement_unit: record.si_measurement_unit,
       value: String(record.value),
     },
   });

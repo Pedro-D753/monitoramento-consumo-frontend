@@ -58,14 +58,14 @@ const formatToMonthlyChartData = (
       if (!monthlyData[sortKey]) {
         monthlyData[sortKey] = {
           sortKey,
-          unitSignature: record.measurement_unit.toLowerCase(),
+          unitSignature: record.si_measurement_unit.toLowerCase(),
           label,
           value: 0,
-          frontColor: getUnitColor(record.measurement_unit),
+          frontColor: getUnitColor(record.si_measurement_unit),
         };
       } else if (
         monthlyData[sortKey].unitSignature !==
-        record.measurement_unit.toLowerCase()
+        record.si_measurement_unit.toLowerCase()
       ) {
         monthlyData[sortKey].frontColor = theme.colors.primary.main;
       }
@@ -92,7 +92,7 @@ const fetchHistory = useCallback(async () => {
     setError(null);
 
     try {
-      const raw = await getConsumos();
+      const raw = await getConsumos("real");
       setCachedData(raw);
       setFilteredData(raw);
       setChartData(formatToMonthlyChartData(raw));
@@ -130,7 +130,7 @@ const fetchHistory = useCallback(async () => {
       let result = [...cachedData];
       if (filters.measurement_unit) {
         result = result.filter(
-          (i) => i.measurement_unit === filters.measurement_unit,
+          (i) => i.si_measurement_unit === filters.measurement_unit,
         );
       }
       if (filters.starting_date) {
