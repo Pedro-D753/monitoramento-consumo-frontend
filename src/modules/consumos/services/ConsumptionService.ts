@@ -57,7 +57,6 @@ export const getConsumos = async (
 ): Promise<ConsumptionRecord[]> => {
   const response = await api.get<ConsumptionRecord[]>(
     ENDPOINTS.consumos.listar,
-    { data: filters  },
   );
   return response.data;
 };

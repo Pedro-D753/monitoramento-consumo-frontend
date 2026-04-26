@@ -98,9 +98,15 @@ const fetchHistory = useCallback(async () => {
       setChartData(formatToMonthlyChartData(raw));
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        // Correção Sênior: Tratando o array de erros do FastAPI
         const detail = err.response?.data?.detail;
         let errorMessage = "Falha ao carregar dados.";
+          // 404 cai aqui e vira mensagem de erro na tela
+          if (err.response?.status === 404) {
+            setCachedData([]);
+            setFilteredData([]);
+            setChartData([]);
+            return; // Lista vazia é estado válido, não erro
+          }
 
         if (typeof detail === 'string') {
             errorMessage = detail;
