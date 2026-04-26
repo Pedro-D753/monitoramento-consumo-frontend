@@ -3,7 +3,7 @@ import { ENDPOINTS } from "@/config/Endpoints";
 import {
   ConsumptionRecord,
   ConsumptionFilters,
-  CreateConsumptionFormOutput,
+  CreateConsumptionPayload,
 } from "../schemas/ConsumptionSchema";
 
 export type EntryType = "real" | "simulation" | "goal";
@@ -26,13 +26,11 @@ export const getConsumos = async (
 
 export const createConsumo = async (
   type: EntryType,
-  data: CreateConsumptionFormOutput,
+  data: CreateConsumptionPayload,
 ): Promise<ConsumptionRecord> => {
-  // BLINDAGEM: Removemos 'description' antes de enviar para evitar Erro 500 no Backend
-  const { description, ...payload } = data;
   const response = await api.post<ConsumptionRecord>(
     ENDPOINT_MAP[type],
-    payload,
+    data,
   );
   return response.data;
 };

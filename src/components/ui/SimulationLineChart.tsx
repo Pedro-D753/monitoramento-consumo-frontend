@@ -27,21 +27,17 @@ export function SimulationLineChart({ data, isLoading }: SimulationLineChartProp
         data={data}
         width={screenWidth - 80}
         height={180}
-        // Suavização da linha
         curved
         curvature={0.2}
-        // Cores da linha e dos pontos
-        color={theme.colors.primary.light} // Verde água do Liqua
+        color={theme.colors.primary.light}
         dataPointsColor={theme.colors.primary.main}
         dataPointsRadius={4}
         thickness={3}
-        // Efeito de fundo preenchido (gradiente visual)
         startFillColor={theme.colors.primary.light}
         endFillColor={theme.colors.primary.light}
         startOpacity={0.3}
         endOpacity={0.05}
         areaChart
-        // Limpeza dos eixos
         hideRules
         xAxisThickness={1}
         yAxisThickness={0}

@@ -5,8 +5,9 @@ import { Typography } from '@/components/ui/Typography';
 import { theme } from '@/config/Theme';
 
 import { useConsumptionHistory } from '@/modules/consumos/hooks/UseConsumptionHistory';
+import { formatDateToApi, parseApiDate } from '@/modules/consumos/schemas/ConsumptionSchema';
 import { ConsumptionBarChart } from '@/components/ui/ConsumptionBarChart';
-import { SimulationLineChart } from '@/components/ui/SimulationLineChart'; // Importamos o gráfico de linha
+import { SimulationLineChart } from '@/components/ui/SimulationLineChart';
 import { ConsumptionCard, ConsumptionType } from '@/components/ui/ConsumptionCard';
 import { Button } from '@/components/ui/Button';
 import { DatePickerInput } from '@/components/ui/DatePickerInput';
@@ -20,47 +21,49 @@ const UNIT_OPTIONS = [
   { label: 'Financeiro (R$)', value: 'R$' },
 ];
 
-const formatLocalToApi = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
 export default function HistoryScreen() {
-  const { data, rawData, isLoading, applyLocalFilters } = useConsumptionHistory();
+  const { data, rawData, isLoading, error, applyLocalFilters } =
+    useConsumptionHistory();
 
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [unit, setUnit] = useState<string>('');
-  
-  // Novo Estado: Controla qual gráfico está sendo exibido
   const [chartType, setChartType] = useState<'bar' | 'line'>('bar');
 
   const handleApplyFilters = () => {
     applyLocalFilters({
-      starting_date: startDate ? formatLocalToApi(startDate) : undefined,
-      ending_date: endDate ? formatLocalToApi(endDate) : undefined,
+      starting_date: startDate ? formatDateToApi(startDate) : undefined,
+      ending_date: endDate ? formatDateToApi(endDate) : undefined,
       measurement_unit: unit || undefined, 
     });
   };
 
-  // Função para alternar entre os gráficos
   const toggleChart = () => {
     setChartType((prev) => (prev === 'bar' ? 'line' : 'bar'));
   };
 
+  const getCardType = (measurementUnit: string): ConsumptionType => {
+    const unitLower = measurementUnit.toLowerCase();
+
+    if (unitLower.includes('r$')) return 'money';
+    if (unitLower.includes('kwh') || unitLower.includes('wh')) return 'energy';
+    if (unitLower.includes('m³') || unitLower.includes('m3') || unitLower.includes('gas')) {
+      return 'gas';
+    }
+    if (unitLower === 'l' || unitLower.includes('litro')) return 'water';
+
+    return 'other';
+  };
+
   return (
-    <PageLayout userName="User" showHeader={false}>
+    <PageLayout showHeader={false}>
       <View style={styles.header}>
         <Typography variant="bold" size="xl">Histórico Completo</Typography>
         <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>
           Acompanhe e filtre seus registros
         </Typography>
       </View>
-      
 
-      {/* 1. Área de Gráficos (Interativa) */}
       <View style={styles.chartArea}>
         <View style={styles.chartHeader}>
           <Typography variant="bold" size="md">
@@ -85,7 +88,6 @@ export default function HistoryScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* 2. Painel de Filtros */}
       <View style={styles.filterCard}>
         <Typography variant="bold" size="md" style={styles.filterTitle}>
           Filtrar Dados
@@ -93,10 +95,20 @@ export default function HistoryScreen() {
         
         <View style={styles.filterRow}>
           <View style={{ flex: 1, marginRight: theme.spacing.sm }}>
-            <DatePickerInput label="Data Inicial" customValue=' ' value={startDate} onChange={setStartDate} />
+            <DatePickerInput
+              label="Data Inicial"
+              customValue=" "
+              value={startDate}
+              onChange={setStartDate}
+            />
           </View>
           <View style={{ flex: 1 }}>
-            <DatePickerInput label="Data Final" customValue=' ' value={endDate} onChange={setEndDate} />
+            <DatePickerInput
+              label="Data Final"
+              customValue=" "
+              value={endDate}
+              onChange={setEndDate}
+            />
           </View>
         </View>
 
@@ -116,7 +128,17 @@ export default function HistoryScreen() {
         />
       </View>
 
-      {/* 3. Lista de Registros */}
+      {error && (
+        <Typography
+          variant="regular"
+          size="sm"
+          color={theme.colors.danger.main}
+          style={styles.errorText}
+        >
+          {error}
+        </Typography>
+      )}
+
       <View style={styles.listSection}>
         <Typography variant="bold" size="lg" style={{ marginBottom: theme.spacing.md }}>
           Resultados ({rawData.length})
@@ -128,21 +150,14 @@ export default function HistoryScreen() {
           </Typography>
         ) : (
           [...rawData].reverse().map((consumo) => {
-            let cardType: ConsumptionType = 'other';
-            const unitLower = consumo.measurement_unit.toLowerCase();
-            if (unitLower.includes('l') || unitLower.includes('m³')) cardType = 'water';
-            else if (unitLower.includes('kwh') || unitLower.includes('w')) cardType = 'energy';
-            else if (unitLower.includes('r$')) cardType = 'money';
-            else if (unitLower.includes('gas')) cardType = 'gas';
-
-            const dateStr = new Date(consumo.ending_date).toLocaleDateString('pt-BR');
+            const dateStr = parseApiDate(consumo.ending_date).toLocaleDateString('pt-BR');
 
             return (
               <ConsumptionCard
                 key={consumo.id.toString()}
                 id={consumo.id}
                 description={consumo.description} 
-                type={cardType}
+                type={getCardType(consumo.measurement_unit)}
                 title={`Consumo de ${consumo.measurement_unit}`}
                 value={consumo.value}
                 unit={consumo.measurement_unit}
@@ -166,7 +181,6 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   chartTouchable: {
-    // Adiciona um feedback visual leve ao redor da área de clique se desejado
     borderRadius: theme.borderRadius.md,
   },
   filterCard: {
@@ -178,6 +192,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xl,
   },
   filterTitle: { marginBottom: theme.spacing.md },
+  errorText: { marginBottom: theme.spacing.md },
   filterRow: { flexDirection: 'row', justifyContent: 'space-between', width: '100%' },
   listSection: { paddingBottom: 40 }
 });

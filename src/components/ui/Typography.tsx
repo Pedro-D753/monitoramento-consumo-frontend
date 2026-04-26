@@ -6,7 +6,7 @@ interface TypographyProps extends TextProps {
   variant?: keyof typeof theme.fonts;
   size?: keyof typeof theme.fontSizes;
   lineHeight?: keyof typeof theme.lineHeights;
-  color?: string; // Mantido como string para flexibilidade, mas prioriza tokens do theme
+  color?: string;
   align?: TextStyle['textAlign'];
 }
 
@@ -20,8 +20,6 @@ export function Typography({
   children,
   ...rest
 }: TypographyProps) {
-  
-  // Cálculo da altura da linha: fontSize * multiplicador do tema
   const fontSize = theme.fontSizes[size];
   const calculatedLineHeight = fontSize * theme.lineHeights[lineHeight];
 

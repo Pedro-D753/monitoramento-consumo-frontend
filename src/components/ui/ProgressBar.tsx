@@ -1,10 +1,9 @@
-// src/components/ui/ProgressBar.tsx
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { theme } from '../../config/Theme';
 
 interface ProgressBarProps {
-  progress: number; // 0 a 100
+  progress: number;
   color?: string;
   height?: number;
 }

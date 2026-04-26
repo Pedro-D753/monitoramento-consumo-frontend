@@ -11,18 +11,14 @@ import { ConsumptionBarChart } from '@/components/ui/ConsumptionBarChart';
 import { useConsumptionHistory } from '@/modules/consumos/hooks/UseConsumptionHistory';
 import { CreateConsumptionForm } from '@/modules/consumos/components/CreateConsumptionForm';
 import { EntryType } from '@/modules/consumos/services/ConsumptionService';
+import { parseApiDate } from '@/modules/consumos/schemas/ConsumptionSchema';
 import { theme } from '@/config/Theme';
 
 export default function DashboardScreen() {
   const router = useRouter();
-  
-  // Extraímos rawData para calcular o resumo financeiro localmente
   const { data, rawData, isLoading, refetch } = useConsumptionHistory(); 
-  
-  // Substituímos o booleano por um estado tipado que controla qual formulário a gaveta deve renderizar
   const [modalType, setModalType] = useState<EntryType | null>(null);
 
-  // Cálculo Dinâmico do Resumo Financeiro (Latência Zero)
   const currentMonthTotal = useMemo(() => {
     const today = new Date();
     const currentMonth = today.getMonth();
@@ -31,7 +27,7 @@ export default function DashboardScreen() {
     return rawData
       .filter((item) => {
         const isMoney = item.measurement_unit.toUpperCase() === 'R$';
-        const itemDate = new Date(item.ending_date);
+        const itemDate = parseApiDate(item.ending_date);
         const isThisMonth = itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
         
         return isMoney && isThisMonth;
@@ -39,20 +35,16 @@ export default function DashboardScreen() {
       .reduce((acc, item) => acc + item.value, 0);
   }, [rawData]);
 
-  // Formatação alinhada com o padrão do resto do app
   const formattedTotal = `R$ ${currentMonthTotal.toFixed(2).replace('.', ',')}`;
 
-  // Disparado quando qualquer formulário (Real, Simulação ou Meta) tem sucesso na API
   const handleSuccess = () => {
-    setModalType(null); // Fecha a gaveta
-    refetch(); // Atualiza os gráficos e o resumo financeiro com o novo dado
+    setModalType(null);
+    refetch();
   };
 
   return (
     <>
-      <PageLayout userName="User">
-        
-        {/* Bloco de Resumo Financeiro Reativo */}
+      <PageLayout>
         <View style={styles.summaryCard}>
           <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>
             Gasto Total (Este Mês)
@@ -63,7 +55,6 @@ export default function DashboardScreen() {
         </View>
 
         <View style={styles.gridContainer}>
-          {/* Coluna da Esquerda */}
           <View style={styles.column}>
             <ActionCard 
               title="Registrar Consumo" 
@@ -79,7 +70,6 @@ export default function DashboardScreen() {
             />
           </View>
 
-          {/* Coluna da Direita */}
           <View style={styles.column}>
             <ActionCard 
               title="Simulações" 
@@ -96,7 +86,6 @@ export default function DashboardScreen() {
           </View>
         </View>
 
-        {/* Gráfico principal renderizado DIRETAMENTE no Dashboard */}
         <View style={styles.chartSection}>
           <ConsumptionBarChart 
             data={data} 
@@ -105,7 +94,6 @@ export default function DashboardScreen() {
         </View>
       </PageLayout>
 
-      {/* A Gaveta (Modal) Dinâmica */}
       <BottomSheetModal
         visible={!!modalType}
         onClose={() => setModalType(null)}
@@ -115,7 +103,6 @@ export default function DashboardScreen() {
           modalType === 'goal' ? 'Definir Meta' : ''
         }
       >
-        {/* Renderiza o formulário passando o tipo exato e a função de callback */}
         {modalType && (
           <CreateConsumptionForm type={modalType} onSuccess={handleSuccess} />
         )}
@@ -144,12 +131,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    gap: theme.spacing.md, 
+    gap: theme.spacing.md,
     marginTop: theme.spacing.minusSM,
   },
   column: {
-    flex: 1, 
+    flex: 1,
     flexDirection: 'column',
-    gap: theme.spacing.md, 
+    gap: theme.spacing.md,
   }
 });

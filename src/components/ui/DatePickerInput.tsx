@@ -7,16 +7,21 @@ import { theme } from '@/config/Theme';
 interface DatePickerInputProps {
   label: string;
   value: Date | undefined;
+  customValue?: string
   onChange: (date: Date) => void;
-  customValue?: string,
   error?: string;
 }
 
-export function DatePickerInput({ label, value, onChange, error, customValue }: DatePickerInputProps) {
+export function DatePickerInput({
+  label,
+  value,
+  customValue,
+  onChange,
+  error,
+}: DatePickerInputProps) {
   const [show, setShow] = useState(false);
 
   const onChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    // No Android, ao selecionar a data, o calendário já fecha
     if (Platform.OS === 'android') setShow(false);
     
     if (selectedDate) {
@@ -24,14 +29,12 @@ export function DatePickerInput({ label, value, onChange, error, customValue }: 
     }
   };
 
-  // Formata a data para exibir na UI (ex: 24/04/2026)
   const displayValue = value ? value.toLocaleDateString('pt-BR') : '';
   const isError = !!error;
   const borderColor = isError ? theme.colors.danger.main : theme.colors.border;
 
   return (
     <View style={styles.wrapper}>
-      {/* Usamos um TouchableOpacity para imitar um Input */}
       <TouchableOpacity 
         style={[styles.inputContainer, { borderColor }]} 
         activeOpacity={0.7}
@@ -43,9 +46,7 @@ export function DatePickerInput({ label, value, onChange, error, customValue }: 
         
         <View style={styles.valueRow}>
           <Text style={styles.valueText}>
-            {displayValue ||  displayValue ? displayValue : (
-              customValue ? customValue : 'Selecione uma data' 
-            )}
+            {displayValue ? displayValue : (customValue ? customValue : "Selecione uma data")}
           </Text>
           <Feather name="calendar" size={20} color={theme.colors.text.secondary} />
         </View>
@@ -59,7 +60,7 @@ export function DatePickerInput({ label, value, onChange, error, customValue }: 
           mode="date"
           display="default"
           onChange={onChangeDate}
-          themeVariant="dark" // Força o visual dark para combinar com o Liqua
+          themeVariant="dark"
         />
       )}
     </View>
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: theme.borderRadius.sm,
     backgroundColor: theme.colors.background.input,
-    height: 55, // Um pouco mais alto para acomodar a Label interna fixa
+    height: 55,
     paddingHorizontal: theme.spacing.md,
     justifyContent: "center",
   },

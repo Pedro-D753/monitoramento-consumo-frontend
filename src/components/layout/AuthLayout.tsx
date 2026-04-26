@@ -12,7 +12,7 @@ import { theme } from "@/config/Theme";
 
 
 interface AuthLayoutProps {
-  children: React.ReactNode; // Define a função de renderização para o conteúdo variável dentro do layout
+  children: React.ReactNode;
   footer?: React.ReactNode;
   header?: React.ReactNode;
 }
@@ -21,8 +21,8 @@ export function AuthLayout({ children, footer, header }: AuthLayoutProps) {
   return (
     <ImageBackground
       resizeMode="cover"
-      source={require("@/assets/authBackground.webp")} // caminho da imagem de background
-      style={styles.ImageBackground} // estilo para a imagem de background
+      source={require("@/assets/authBackground.webp")}
+      style={styles.ImageBackground}
     >
       <SafeAreaView edges={["bottom"]} style={{ flex: 1 }}>
         <KeyboardAvoidingView
@@ -33,26 +33,22 @@ export function AuthLayout({ children, footer, header }: AuthLayoutProps) {
             source={require("@/assets/liquaLogo.webp")}
             style={styles.logo}
           />
-          {/*Barra auxilair para customização de telas*/}
           {header}
           <ScrollView
             contentContainerStyle={styles.content}
             keyboardShouldPersistTaps="handled"
           >
-            {/* logo aqui */}
             <View style={styles.card}>
-              {/* conteúdo variável aqui */}
               {children}
             </View>
-            {/* rodapé opcional aqui */}
             {footer && (
               <View
                 style={{
                   width: "100%",
                   marginTop: theme.spacing.lg,
                   alignItems: "center",
-                  alignSelf: "center", // Centraliza o conteúdo do rodapé
-                  maxWidth: 300, // Limita a largura máxima para telas maiores
+                  alignSelf: "center",
+                  maxWidth: 300,
                 }}
               >
                 {footer}
@@ -66,7 +62,6 @@ export function AuthLayout({ children, footer, header }: AuthLayoutProps) {
 }
 
 const styles = StyleSheet.create({
-  // estilos aqui
   ImageBackground: {
     flex: 1,
     width: "100%",
@@ -87,9 +82,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: theme.spacing.lg,
     width: "100%",
-    maxWidth: 400, // Limita a largura máxima para telas maiores
-    alignSelf: "center", // Centraliza horizontalmente
-    alignItems: "center", // Centraliza os itens dentro do card
+    maxWidth: 400,
+    alignSelf: "center",
+    alignItems: "center",
   },
   logo: {
     marginTop: theme.spacing.md,

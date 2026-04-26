@@ -7,23 +7,22 @@ import { theme } from '@/config/Theme';
 export type ConsumptionType = 'water' | 'energy' | 'gas' | 'money' | 'other';
 
 interface ConsumptionCardProps {
-  id: number;           // Novo: ID retornado da API
-  description?: string; // Novo: Nome customizado/Identificador opcional
+  id: number;
+  description?: string;
   type: ConsumptionType;
   title: string;
-  value: number;        // Ex: 400 
-  unit: string;         // Ex: 'kWh' ou 'L'
-  date: string;         // Ex: "Hoje, 14:30"
-  cost?: number;        // Ex: 45.90 (opcional)
+  value: number;
+  unit: string;
+  date: string;
+  cost?: number;
 }
 
-// Um dicionário de mapeamento para os ícones e cores baseado no tipo de consumo
 const typeConfig = {
-  water: { icon: 'droplet', color: '#3498db' },       // Azul
-  energy: { icon: 'zap', color: '#f1c40f' },          // Amarelo
-  gas: { icon: 'wind', color: '#e74c3c' },            // Vermelho
-  money: { icon: 'dollar-sign', color: '#0bc53a'},    // Verde (Corrigido para dollar-sign)
-  other: { icon: 'box', color: '#95a5a6' },           // Cinza
+  water: { icon: 'droplet', color: '#3498db' },
+  energy: { icon: 'zap', color: '#f1c40f' },
+  gas: { icon: 'wind', color: '#e74c3c' },
+  money: { icon: 'dollar-sign', color: '#0bc53a'},
+  other: { icon: 'box', color: '#95a5a6' },
 } as const;
 
 export function ConsumptionCard({ id, description, type, title, value, unit, date, cost }: ConsumptionCardProps) {
@@ -37,7 +36,6 @@ export function ConsumptionCard({ id, description, type, title, value, unit, dat
         </View>
         
         <View>
-          {/* Prioriza a descrição personalizada, senão usa o título da categoria */}
           <Typography variant="bold" size="md">
             {description ? description : title}
           </Typography>
@@ -51,8 +49,7 @@ export function ConsumptionCard({ id, description, type, title, value, unit, dat
         <Typography variant="bold" size="lg" color={theme.colors.text.primary}>
           {value} <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>{unit}</Typography>
         </Typography>
-        {/* Se a API mandar o custo, renderiza pequenininho embaixo */}
-        {cost && (
+        {cost !== undefined && (
           <Typography variant="regular" size="xs" color={theme.colors.text.secondary}>
             R$ {cost.toFixed(2).replace('.', ',')}
           </Typography>
@@ -67,7 +64,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: theme.colors.card.subCard, // Fundo escuro do seu Figma
+    backgroundColor: theme.colors.card.subCard,
     padding: theme.spacing.md,
     borderRadius: theme.borderRadius.md,
     marginBottom: theme.spacing.sm,

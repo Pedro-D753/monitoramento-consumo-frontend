@@ -21,7 +21,6 @@ interface SelectInputProps {
 export function SelectInput({ label, options, value, onSelect, error, placeholder }: SelectInputProps) {
   const [isVisible, setIsVisible] = useState(false);
 
-  // Busca o rótulo da opção selecionada para exibir no campo
   const selectedOption = options.find(opt => opt.value === value);
 
   const handleSelect = (val: string) => {

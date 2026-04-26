@@ -1,4 +1,4 @@
-import { Text, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { useState } from "react";
 import axios from "axios";
 import { useForm, Controller } from "react-hook-form";

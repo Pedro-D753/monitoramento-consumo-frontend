@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, ViewStyle, Image, ImageBackground } from 'react-native';
+import { View, StyleSheet, ScrollView, ViewStyle, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '@/modules/auth/context/AuthContext';
 import { Header } from './Header';
 import { theme } from '@/config/Theme';
 
@@ -16,9 +17,12 @@ export function PageLayout({
     children,
     showHeader = true,
     userName,
-    scrollable = true,
-    contentStyle
+  scrollable = true,
+  contentStyle
 }: PageLayoutProps) {
+    const { user } = useAuth();
+    const resolvedUserName =
+        userName ?? user?.real_name ?? user?.username ?? 'Usuário';
     
     const content = (
         <View style={[styles.content, contentStyle]}>
@@ -35,7 +39,7 @@ export function PageLayout({
             >
                 <SafeAreaView style={styles.safeArea} edges={['top']}>
                         <View style={styles.container}>
-                            {showHeader && <Header userName={userName} />}
+                            {showHeader && <Header userName={resolvedUserName} />}
 
                             {scrollable ? (
                                 <ScrollView
@@ -57,7 +61,7 @@ export function PageLayout({
 const styles = StyleSheet.create({
     rootContainer: {
         flex: 1,
-        backgroundColor: theme.colors.background.primary, // A cor de fundo principal vem para a base
+        backgroundColor: theme.colors.background.primary,
   },
   safeArea: {
     flex: 1,
@@ -68,7 +72,7 @@ const styles = StyleSheet.create({
   },
   scrollGrow: {
     flexGrow: 1,
-    paddingBottom: 100, // Espaço sagrado para a Bottom Tab Bar não cobrir o final da lista!
+    paddingBottom: 100,
   },
   overlay: {
     width: '100%',

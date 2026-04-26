@@ -2,16 +2,14 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { theme } from "@/config/Theme";
 
-// Definição da Interface (Contrato)
 interface StepIndicatorProps {
   totalSteps: number;
-  currentStep: number; // Esperamos o número da etapa (1, 2, 3...)
+  currentStep: number;
 }
 
 export function StepIndicator({ totalSteps, currentStep }: StepIndicatorProps) {
   return (
     <View style={styles.container}>
-      {/* Lógica de transformação de número em lista JSX */}
       {Array.from({ length: totalSteps }, (_, index) => {
         const stepNumber = index + 1;
         const isActive = stepNumber <= currentStep;
@@ -19,7 +17,6 @@ export function StepIndicator({ totalSteps, currentStep }: StepIndicatorProps) {
 
         return (
           <React.Fragment key={stepNumber}>
-            {/* Círculo do Step */}
             <View
               style={[
                 styles.stepCircle,
@@ -28,7 +25,6 @@ export function StepIndicator({ totalSteps, currentStep }: StepIndicatorProps) {
               ]}
             />
 
-            {/* Linha conectora entre os círculos (exceto após o último) */}
             {stepNumber < totalSteps && (
               <View
                 style={[
@@ -73,12 +69,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
     shadowRadius: 4,
-    elevation: 5, // Para Android
+    elevation: 5,
   },
   line: {
     height: 2,
     flex: 1,
-    maxWidth: 40, // Define o espaçamento entre círculos
+    maxWidth: 40,
     marginHorizontal: 4,
   },
   activeLine: {

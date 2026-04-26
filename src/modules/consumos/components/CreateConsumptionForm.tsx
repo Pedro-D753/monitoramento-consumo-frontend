@@ -1,6 +1,6 @@
-// src/modules/consumos/components/CreateConsumptionForm.tsx
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
+import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/Input";
@@ -50,13 +50,17 @@ export function CreateConsumptionForm({ type = "real", onSuccess }: Props) {
     try {
       await createConsumo(type, data);
       onSuccess();
-    } catch (error: any) {
-      const detail = error.response?.data?.detail;
-      setErrorMsg(
-        Array.isArray(detail)
-          ? `Erro: ${detail[0].msg}`
-          : detail || "Erro no servidor (500).",
-      );
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const detail = error.response?.data?.detail;
+        setErrorMsg(
+          Array.isArray(detail)
+            ? detail[0]?.msg || "Não foi possível salvar o registro."
+            : detail || "Não foi possível salvar o registro.",
+        );
+      } else {
+        setErrorMsg("Não foi possível salvar o registro.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -64,18 +68,6 @@ export function CreateConsumptionForm({ type = "real", onSuccess }: Props) {
 
   return (
     <View style={styles.container}>
-      <Controller
-        control={control}
-        name="description"
-        render={({ field }) => (
-          <Input
-            label="Nota / Identificador (Opcional)"
-            value={field.value}
-            onChangeText={field.onChange}
-          />
-        )}
-      />
-
       <Controller
         control={control}
         name="si_measurement_unit"
@@ -88,10 +80,16 @@ export function CreateConsumptionForm({ type = "real", onSuccess }: Props) {
               onSelect={(val) => {
                 if (val === "custom") {
                   setIsCustomUnit(true);
-                  setValue("si_measurement_unit", "");
+                  setValue("si_measurement_unit", "", {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
                 } else {
                   setIsCustomUnit(false);
-                  field.onChange(val);
+                  setValue("si_measurement_unit", val, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
                 }
               }}
               error={

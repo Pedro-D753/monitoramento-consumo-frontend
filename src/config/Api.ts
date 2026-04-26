@@ -7,6 +7,7 @@ type RetryableRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
 };
 
+// Essas rotas não devem disparar refresh automático em caso de 401.
 const NON_REFRESH_RETRY_PATHS = [
   ENDPOINTS.auth.login,
   ENDPOINTS.auth.register,
@@ -23,6 +24,7 @@ export const api = axios.create({
   },
 });
 
+// Requests que falham juntos compartilham o mesmo refresh para evitar corrida.
 let refreshPromise: Promise<string> | null = null;
 
 async function clearSessionAndRedirect() {
@@ -97,7 +99,12 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    originalRequest._retry = true;
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
+
+    const retryRequest = originalRequest;
+    retryRequest._retry = true;
 
     try {
       if (!refreshPromise) {
@@ -107,9 +114,9 @@ api.interceptors.response.use(
       }
 
       const newAccessToken = await refreshPromise;
-      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+      retryRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
-      return api(originalRequest);
+      return api(retryRequest);
     } catch (refreshError) {
       await clearSessionAndRedirect();
       return Promise.reject(refreshError);

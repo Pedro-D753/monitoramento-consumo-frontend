@@ -14,16 +14,12 @@ export function Header({ userName = 'Usuário', tips = 'Continue se esforçando 
     const router = useRouter()
     return (
         <View style={styles.container}>
-            
-            {/* LINHA SUPERIOR: Usuário à esquerda e Botões à direita */}
             <View style={styles.topRow}>
                 <View style={styles.userInfo}>
-                    {/* Avatar PlaceHolder */}
                     <View style={styles.avatar}>
                         <Feather name='user' size={24} color={theme.colors.text.primary}/>
                     </View>
 
-                    {/* Saudação */}
                     <View>
                         <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>
                             Bem-vindo de volta,
@@ -34,13 +30,11 @@ export function Header({ userName = 'Usuário', tips = 'Continue se esforçando 
                     </View>
                 </View>
 
-                {/* Botão de config ou qualquer outra coisa */}
                 <TouchableOpacity activeOpacity={0.8} style={styles.actionButton} onPress={() => router.push('/(app)/profile')}>
                     <Feather name='settings' size={20} color={theme.colors.text.primary}/>
                 </TouchableOpacity>
             </View>
 
-            {/* BASE: Dicas */}
             <View style={styles.tips}>
                 <Typography variant='bold' size='lg'>Dica do dia:</Typography>
                 <Typography variant='regular' size='sm' style={styles.tipText}>{tips}</Typography>
@@ -52,11 +46,9 @@ export function Header({ userName = 'Usuário', tips = 'Continue se esforçando 
 
 const styles = StyleSheet.create({
   container: {
-    // O flexDirection padrão já é 'column'. 
-    // Com space-between, o topRow vai pro topo e as tips vão pra base.
     justifyContent: 'space-between',
     alignSelf: 'center',
-    padding: theme.spacing.md, // Centraliza o padding para todos os lados
+    padding: theme.spacing.md,
     backgroundColor: theme.colors.card.infoCard,
     borderRadius: theme.borderRadius.lg,
     height: 200,
@@ -65,7 +57,7 @@ const styles = StyleSheet.create({
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start', // Mantém o botão alinhado ao topo caso os textos fiquem grandes
+    alignItems: 'flex-start',
     width: '100%',
   },
   userInfo: {
@@ -92,7 +84,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tips: {
-    // Como está num container do tipo column, ele vai se alinhar naturalmente à esquerda.
     backgroundColor: theme.colors.tools,
     borderRadius: theme.borderRadius.xl, 
     alignItems: 'flex-start',
