@@ -22,7 +22,6 @@ interface BottomSheetModalProps {
 export function BottomSheetModal({ visible, onClose, title, children }: BottomSheetModalProps) {
   const insets = useSafeAreaInsets();
 
-  // Proteção contra a falha de leitura da One UI (Samsung)
   const safeBottomPadding = Platform.OS === 'android' && insets.bottom === 0 
     ? 34 
     : insets.bottom;
@@ -35,7 +34,7 @@ export function BottomSheetModal({ visible, onClose, title, children }: BottomSh
       animationType="slide" 
       transparent={true} 
       onRequestClose={onClose}
-      statusBarTranslucent={true} // Corrige o bug do modal no Android
+      statusBarTranslucent={true}
     >
       <KeyboardAvoidingView 
         style={styles.overlay} 
@@ -89,7 +88,5 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 4,
   },
-  content: {
-    // Container flexível
-  }
+  content: {}
 });

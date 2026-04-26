@@ -1,28 +1,37 @@
 import React from "react";
-import { Text, TextProps } from "react-native";
+import { Text, TextProps, TextStyle } from "react-native";
 import { theme } from "@/config/Theme";
 
 interface TypographyProps extends TextProps {
-  variant?: "regular" | "medium" | "bold";
+  variant?: keyof typeof theme.fonts;
   size?: keyof typeof theme.fontSizes;
-  color?: string; // Permite passar uma cor customizada, mas terá um padrão
+  lineHeight?: keyof typeof theme.lineHeights;
+  color?: string;
+  align?: TextStyle['textAlign'];
 }
 
 export function Typography({
   variant = "regular",
   size = "md",
-  color = theme.colors.text.primary,
+  lineHeight = "normal",
+  color,
+  align = "left",
   style,
   children,
   ...rest
 }: TypographyProps) {
+  const fontSize = theme.fontSizes[size];
+  const calculatedLineHeight = fontSize * theme.lineHeights[lineHeight];
+
   return (
     <Text
       style={[
         {
           fontFamily: theme.fonts[variant],
-          fontSize: theme.fontSizes[size],
-          color: color,
+          fontSize: fontSize,
+          lineHeight: calculatedLineHeight,
+          color: color || theme.colors.text.primary,
+          textAlign: align,
         },
         style,
       ]}

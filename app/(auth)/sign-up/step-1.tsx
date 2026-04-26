@@ -1,9 +1,7 @@
-//Importando modulos e libs globais
-import { Text, View, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-//Importando componentes e configs locais
 import {
   SignUpStep1Data,
   signUpStep1Schema,
@@ -106,8 +104,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.card.subCard,
     borderRadius: theme.borderRadius.md,
     width: "95%",
-    maxWidth: 400, // Limita a largura máxima para telas maiores
-    alignSelf: "center", // Centraliza horizontalmente
-    alignItems: "center", // Centraliza os itens dentro do card
+    maxWidth: 400,
+    alignSelf: "center",
+    alignItems: "center",
   },
 });

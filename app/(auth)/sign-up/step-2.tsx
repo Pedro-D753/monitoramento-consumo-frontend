@@ -1,10 +1,8 @@
-//Importndo bibliotecas
 import { View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
-//importando componentes e configs locais
 import { Input } from "@/components/ui/Input";
 import {
   SignUpStep2Data,
@@ -79,8 +77,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.card.subCard,
     borderRadius: theme.borderRadius.md,
     width: "95%",
-    maxWidth: 400, // Limita a largura máxima para telas maiores
-    alignSelf: "center", // Centraliza horizontalmente
-    alignItems: "center", // Centraliza os itens dentro do card
+    maxWidth: 400,
+    alignSelf: "center",
+    alignItems: "center",
   },
 });

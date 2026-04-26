@@ -1,9 +1,8 @@
 import { api } from "@/config/Api";
+import { ENDPOINTS } from "@/config/Endpoints";
 import { LoginFormData } from "../schemas/LoginSchema";
 import { SignUpData } from "../schemas/SignUpSchema";
-import { ENDPOINTS } from "@/config/Endpoints";
 
-// Interfaces baseadas no retorno do backend FastAPI
 export interface LoginResponse {
   access_token: string;
   refresh_token: string;
@@ -15,6 +14,7 @@ export interface UserProfile {
   email: string;
   username: string;
   real_name: string;
+  created_at?: string;
 }
 
 interface RegisterResponse {
@@ -23,6 +23,13 @@ interface RegisterResponse {
   username: string;
   email: string;
   created_at: string;
+}
+
+export interface UpdateUserPayload {
+  new_real_name?: string;
+  new_username?: string;
+  new_email?: string;
+  new_password?: string;
 }
 
 export const loginUser = async (
@@ -48,8 +55,36 @@ export const registerUser = async (
   data: SignUpData,
 ): Promise<RegisterResponse> => {
   const response = await api.post<RegisterResponse>(
-    ENDPOINTS.auth.register, 
-    data
+    ENDPOINTS.auth.register,
+    data,
   );
   return response.data;
+};
+
+export const updateUser = async (
+  data: UpdateUserPayload,
+): Promise<UserProfile> => {
+  const response = await api.patch<UserProfile>(ENDPOINTS.auth.editUser, data);
+  return response.data;
+};
+
+export const logoutUser = async (refreshToken: string): Promise<void> => {
+  await api.post(ENDPOINTS.auth.logout, { refresh_token: refreshToken });
+};
+
+export const forgotPassword = async (email: string): Promise<void> => {
+  await api.post(ENDPOINTS.auth.forgotPassword, { email });
+};
+
+export const resetPassword = async (newPassword: string, recoveryToken: string): Promise<void> => {
+  await api.post(ENDPOINTS.auth.resetPassword, {
+    new_password: newPassword,
+    recovery_token: recoveryToken,
+  });
+};
+
+export const deleteUser = async (refreshToken: string): Promise<void> => {
+  await api.delete(ENDPOINTS.auth.deleteUser, {
+    data: { refresh_token: refreshToken },
+  });
 };
