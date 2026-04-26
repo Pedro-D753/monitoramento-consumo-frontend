@@ -41,7 +41,7 @@ export default function HistoryScreen() {
     applyLocalFilters({
       starting_date: startDate ? formatDateToApi(startDate) : undefined,
       ending_date: endDate ? formatDateToApi(endDate) : undefined,
-      measurement_unit: unit || undefined, 
+      si_measurement_unit: unit || undefined 
     });
   };
 

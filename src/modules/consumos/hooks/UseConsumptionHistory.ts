@@ -128,10 +128,8 @@ const fetchHistory = useCallback(async () => {
     (filters: ConsumptionFilters) => {
       // Os filtros são aplicados localmente sobre o cache já carregado da API.
       let result = [...cachedData];
-      if (filters.measurement_unit) {
-        result = result.filter(
-          (i) => i.si_measurement_unit === filters.measurement_unit,
-        );
+      if (filters.si_measurement_unit) {
+        result = result.filter((i) => i.si_measurement_unit === filters.si_measurement_unit);
       }
       if (filters.starting_date) {
         const start = parseApiDate(filters.starting_date).getTime();

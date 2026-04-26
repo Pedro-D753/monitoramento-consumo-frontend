@@ -35,18 +35,9 @@ export interface UpdateUserPayload {
 export const loginUser = async (
   data: LoginFormData,
 ): Promise<LoginResponse> => {
-  const formData =
-    `username=${encodeURIComponent(data.email)}` +
-    `&password=${encodeURIComponent(data.password)}`;
-
   const response = await api.post<LoginResponse>(
     ENDPOINTS.auth.login,
-    formData,
-    {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    },
+    data,
   );
 
   return response.data;

@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 
 import { PageLayout } from '@/components/layout/PageLayout';
@@ -11,8 +10,13 @@ import { useGoals } from '@/modules/consumos/hooks/UseGoals';
 import { useConsumptionHistory } from '@/modules/consumos/hooks/UseConsumptionHistory';
 import { ConsumptionRecord, parseApiDate } from '@/modules/consumos/schemas/ConsumptionSchema';
 
+interface GoalCardProps {
+  // ... suas props existentes (id, title, type, etc)
+  type: 'water' | 'electricity' | 'gas'; 
+  onDelete?: () => void; // Callback opcional
+}
+
 export default function GoalsScreen() {
-  const router = useRouter();
   const { goals, isLoading: loadingGoals } = useGoals();
   const { rawData, isLoading: loadingHistory } = useConsumptionHistory();
 
@@ -30,11 +34,13 @@ export default function GoalsScreen() {
 
     const percentage = Math.min((currentSpent / goal.value) * 100, 100);
     const isOverLimit = currentSpent > goal.value;
+    const cType = (goal.si_measurement_unit.toLowerCase)
 
-    return { currentSpent, percentage, isOverLimit };
+    return { currentSpent, percentage, isOverLimit, cType };
   };
 
   const isLoading = loadingGoals || loadingHistory;
+
 
   return (
     <PageLayout showHeader={false}>
@@ -85,10 +91,10 @@ export default function GoalsScreen() {
 
                 <View style={styles.progressTextContainer}>
                   <Typography variant="medium" size="md" color={isOverLimit ? theme.colors.danger.main : theme.colors.text.primary}>
-                    {currentSpent.toFixed(1)} / {goal.value} {goal.si_measurement_unit}
+                    {currentSpent} / {goal.value} {goal.si_measurement_unit}
                   </Typography>
                   <Typography variant="bold" size="md" color={barColor}>
-                    {percentage.toFixed(0)}%
+                    {percentage?.toFixed(1)}%
                   </Typography>
                 </View>
 

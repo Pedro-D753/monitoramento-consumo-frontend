@@ -43,7 +43,7 @@ export function ConsumptionCard({
           </View>
           <View>
             <Typography variant="bold" size="md">
-              {description ?? title}
+              {(description ?? title).toUpperCase()}
             </Typography>
             <Typography variant="regular" size="xs" color={theme.colors.text.secondary}>
               ID: #{id} • {date}
@@ -55,7 +55,11 @@ export function ConsumptionCard({
           <Typography variant="bold" size="lg">
             {value}{" "}
             <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>
-              {unit?.toLowerCase() === 'r$' ? 'R$' : unit}
+              {unit?.toLowerCase() === 'kwh' ? 'kWh' : 
+                unit?.toLowerCase() === 'l' || 
+                unit?.toLowerCase() === 'r$' || 
+                unit?.toLowerCase() === 'm³' ? 
+                unit?.toUpperCase() : unit }
             </Typography>
           </Typography>
           {cost !== undefined && (
