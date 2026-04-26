@@ -5,13 +5,17 @@ import { Typography } from '@/components/ui/Typography';
 import { theme } from '@/config/Theme';
 
 import { useConsumptionHistory } from '@/modules/consumos/hooks/UseConsumptionHistory';
-import { formatDateToApi, parseApiDate } from '@/modules/consumos/schemas/ConsumptionSchema';
-import { ConsumptionBarChart } from '@/components/ui/ConsumptionBarChart';
+import { ConsumptionRecord, formatDateToApi, parseApiDate } from '@/modules/consumos/schemas/ConsumptionSchema';import { ConsumptionBarChart } from '@/components/ui/ConsumptionBarChart';
 import { SimulationLineChart } from '@/components/ui/SimulationLineChart';
 import { ConsumptionCard, ConsumptionType } from '@/components/ui/ConsumptionCard';
 import { Button } from '@/components/ui/Button';
 import { DatePickerInput } from '@/components/ui/DatePickerInput';
 import { SelectInput } from '@/components/ui/SelectInput';
+
+
+import { EditConsumptionForm } from '@/modules/consumos/components/EditConsumptionForm';
+import { deleteConsumo } from '@/modules/consumos/services/ConsumptionService';
+import { BottomSheetModal } from '@/components/ui/BottomSheetModal';
 
 const UNIT_OPTIONS = [
   { label: 'Todas as Unidades', value: '' }, 
@@ -22,7 +26,7 @@ const UNIT_OPTIONS = [
 ];
 
 export default function HistoryScreen() {
-  const { data, rawData, isLoading, error, applyLocalFilters } =
+  const { data, rawData, isLoading, error, applyLocalFilters, refetch } =
     useConsumptionHistory();
 
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
@@ -55,119 +59,154 @@ export default function HistoryScreen() {
     return 'other';
   };
 
+  const [editingRecord, setEditingRecord] = useState<ConsumptionRecord | null>(null);
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteConsumo('real', id);
+      applyLocalFilters({}); // Força re-render local
+      refetch();             // Sincroniza com backend
+    } catch {
+      // Erro silencioso — o card já reverteu o estado de confirmação
+    }
+  };
+
+  const handleEditSuccess = () => {
+    setEditingRecord(null);
+    refetch();
+  };
+
   return (
-    <PageLayout showHeader={false}>
-      <View style={styles.header}>
-        <Typography variant="bold" size="xl">Histórico Completo</Typography>
-        <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>
-          Acompanhe e filtre seus registros
-        </Typography>
-      </View>
-
-      <View style={styles.chartArea}>
-        <View style={styles.chartHeader}>
-          <Typography variant="bold" size="md">
-            {chartType === 'bar' ? 'Volume de Consumo' : 'Tendência de Consumo'}
+    <>
+      <PageLayout showHeader={false}>
+        <View style={styles.header}>
+          <Typography variant="bold" size="xl">Histórico Completo</Typography>
+          <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>
+            Acompanhe e filtre seus registros
           </Typography>
         </View>
 
-        <Typography variant="regular" size="xs" color={theme.colors.primary.main} style={{marginBottom: 10, marginTop: -10}}>
-          (Toque no gráfico para alterar)
-        </Typography>
+        <View style={styles.chartArea}>
+          <View style={styles.chartHeader}>
+            <Typography variant="bold" size="md">
+              {chartType === 'bar' ? 'Volume de Consumo' : 'Tendência de Consumo'}
+            </Typography>
+          </View>
 
-        <TouchableOpacity 
-          activeOpacity={0.8} 
-          onPress={toggleChart} 
-          style={styles.chartTouchable}
-        >
-          {chartType === 'bar' ? (
-            <ConsumptionBarChart data={data} isLoading={isLoading} />
+          <Typography variant="regular" size="xs" color={theme.colors.primary.main} style={{marginBottom: 10, marginTop: -10}}>
+            (Toque no gráfico para alterar)
+          </Typography>
+
+          <TouchableOpacity 
+            activeOpacity={0.8} 
+            onPress={toggleChart} 
+            style={styles.chartTouchable}
+          >
+            {chartType === 'bar' ? (
+              <ConsumptionBarChart data={data} isLoading={isLoading} />
+            ) : (
+              <SimulationLineChart data={data} isLoading={isLoading} />
+            )}
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.filterCard}>
+          <Typography variant="bold" size="md" style={styles.filterTitle}>
+            Filtrar Dados
+          </Typography>
+          
+          <View style={styles.filterRow}>
+            <View style={{ flex: 1, marginRight: theme.spacing.sm }}>
+              <DatePickerInput
+                label="Data Inicial"
+                customValue=" "
+                value={startDate}
+                onChange={setStartDate}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <DatePickerInput
+                label="Data Final"
+                customValue=" "
+                value={endDate}
+                onChange={setEndDate}
+              />
+            </View>
+          </View>
+
+          <SelectInput
+            label="Unidade de Medida"
+            options={UNIT_OPTIONS}
+            value={unit}
+            onSelect={setUnit}
+            placeholder="Selecione..."
+          />
+
+          <Button 
+            title="Aplicar Filtros" 
+            onPress={handleApplyFilters} 
+            isLoading={isLoading}
+            style={{ marginTop: theme.spacing.sm, width: '100%' }}
+          />
+        </View>
+
+        {error && (
+          <Typography
+            variant="regular"
+            size="sm"
+            color={theme.colors.danger.main}
+            style={styles.errorText}
+          >
+            {error}
+          </Typography>
+        )}
+
+        <View style={styles.listSection}>
+          <Typography variant="bold" size="lg" style={{ marginBottom: theme.spacing.md }}>
+            Resultados ({rawData.length})
+          </Typography>
+
+          {rawData.length === 0 && !isLoading ? (
+            <Typography variant="regular" align="center" color={theme.colors.text.disabled} style={{ marginTop: 20 }}>
+              Nenhum consumo encontrado para estes filtros.
+            </Typography>
           ) : (
-            <SimulationLineChart data={data} isLoading={isLoading} />
-          )}
-        </TouchableOpacity>
-      </View>
+            [...rawData].reverse().map((consumo) => {
+              const dateStr = parseApiDate(consumo.ending_date).toLocaleDateString('pt-BR');
 
-      <View style={styles.filterCard}>
-        <Typography variant="bold" size="md" style={styles.filterTitle}>
-          Filtrar Dados
-        </Typography>
-        
-        <View style={styles.filterRow}>
-          <View style={{ flex: 1, marginRight: theme.spacing.sm }}>
-            <DatePickerInput
-              label="Data Inicial"
-              customValue=" "
-              value={startDate}
-              onChange={setStartDate}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <DatePickerInput
-              label="Data Final"
-              customValue=" "
-              value={endDate}
-              onChange={setEndDate}
-            />
-          </View>
-        </View>
-
-        <SelectInput
-          label="Unidade de Medida"
-          options={UNIT_OPTIONS}
-          value={unit}
-          onSelect={setUnit}
-          placeholder="Selecione..."
-        />
-
-        <Button 
-          title="Aplicar Filtros" 
-          onPress={handleApplyFilters} 
-          isLoading={isLoading}
-          style={{ marginTop: theme.spacing.sm, width: '100%' }}
-        />
-      </View>
-
-      {error && (
-        <Typography
-          variant="regular"
-          size="sm"
-          color={theme.colors.danger.main}
-          style={styles.errorText}
-        >
-          {error}
-        </Typography>
-      )}
-
-      <View style={styles.listSection}>
-        <Typography variant="bold" size="lg" style={{ marginBottom: theme.spacing.md }}>
-          Resultados ({rawData.length})
-        </Typography>
-
-        {rawData.length === 0 && !isLoading ? (
-          <Typography variant="regular" align="center" color={theme.colors.text.disabled} style={{ marginTop: 20 }}>
-            Nenhum consumo encontrado para estes filtros.
-          </Typography>
-        ) : (
-          [...rawData].reverse().map((consumo) => {
-            const dateStr = parseApiDate(consumo.ending_date).toLocaleDateString('pt-BR');
-
-            return (
+              return (
               <ConsumptionCard
                 key={consumo.id.toString()}
                 id={consumo.id}
-                description={consumo.description} 
+                description={consumo.description}
                 type={getCardType(consumo.measurement_unit)}
                 title={`Consumo de ${consumo.measurement_unit}`}
                 value={consumo.value}
                 unit={consumo.measurement_unit}
                 date={dateStr}
+                onEdit={() => setEditingRecord(consumo)}       // ← novo
+                onDelete={() => handleDelete(consumo.id)}      // ← novo
               />
-            );
-          })
+              );
+            })
+          )}
+        </View>
+      </PageLayout>
+      <BottomSheetModal
+        visible={!!editingRecord}
+        onClose={() => setEditingRecord(null)}
+        title="Editar Consumo"
+      >
+        {editingRecord && (
+          <EditConsumptionForm
+            type="real"
+            record={editingRecord}
+            onSuccess={handleEditSuccess}
+            onCancel={() => setEditingRecord(null)}
+          />
         )}
-      </View>
-    </PageLayout>
+      </BottomSheetModal>
+    </>
   );
 }
 

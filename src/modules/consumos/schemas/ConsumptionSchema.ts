@@ -63,6 +63,24 @@ export const createConsumptionSchema = z
     message: "A data final deve ser igual ou posterior à inicial.",
   });
 
+export const editConsumptionSchema = z.object({
+  starting_date: z.date().optional(),
+  ending_date: z.date().optional(),
+  si_measurement_unit: z.string().trim().min(1, "Unidade obrigatória").optional(),
+  value: z
+    .string()
+    .trim()
+    .optional()
+    .refine(
+      (val) => !val || (!isNaN(Number(val.replace(",", "."))) && Number(val.replace(",", ".")) > 0),
+      "Deve ser maior que zero",
+    ),
+});
+
+export type EditConsumptionFormData = z.infer<typeof editConsumptionSchema>;
+export type EditConsumptionFormInput = z.input<typeof editConsumptionSchema>;
+export type EditConsumptionFormOutput = z.output<typeof editConsumptionSchema>;
+
 export type CreateConsumptionFormInput = z.input<
   typeof createConsumptionSchema
 >;

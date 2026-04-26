@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { Typography } from '@/components/ui/Typography';
 import { theme } from '@/config/Theme';
@@ -15,61 +15,134 @@ interface ConsumptionCardProps {
   unit: string;
   date: string;
   cost?: number;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 const typeConfig = {
   water: { icon: 'droplet', color: '#3498db' },
   energy: { icon: 'zap', color: '#f1c40f' },
   gas: { icon: 'wind', color: '#e74c3c' },
-  money: { icon: 'dollar-sign', color: '#0bc53a'},
+  money: { icon: 'dollar-sign', color: '#0bc53a' },
   other: { icon: 'box', color: '#95a5a6' },
 } as const;
 
-export function ConsumptionCard({ id, description, type, title, value, unit, date, cost }: ConsumptionCardProps) {
+export function ConsumptionCard({
+  id, description, type, title, value, unit, date, cost, onEdit, onDelete,
+}: ConsumptionCardProps) {
   const config = typeConfig[type];
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const hasActions = !!onEdit || !!onDelete;
 
   return (
     <View style={styles.card}>
-      <View style={styles.leftSection}>
-        <View style={[styles.iconContainer, { backgroundColor: config.color + '20' }]}>
-          <Feather name={config.icon as any} size={24} color={config.color} />
+      <View style={styles.mainRow}>
+        <View style={styles.leftSection}>
+          <View style={[styles.iconContainer, { backgroundColor: config.color + '20' }]}>
+            <Feather name={config.icon as any} size={24} color={config.color} />
+          </View>
+          <View>
+            <Typography variant="bold" size="md">
+              {description ?? title}
+            </Typography>
+            <Typography variant="regular" size="xs" color={theme.colors.text.secondary}>
+              ID: #{id} • {date}
+            </Typography>
+          </View>
         </View>
-        
-        <View>
-          <Typography variant="bold" size="md">
-            {description ? description : title}
+
+        <View style={styles.rightSection}>
+          <Typography variant="bold" size="lg">
+            {value}{" "}
+            <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>
+              {unit}
+            </Typography>
           </Typography>
-          <Typography variant="regular" size="xs" color={theme.colors.text.secondary}>
-            ID: #{id} • {date}
-          </Typography>
+          {cost !== undefined && (
+            <Typography variant="regular" size="xs" color={theme.colors.text.secondary}>
+              R$ {cost.toFixed(2).replace(".", ",")}
+            </Typography>
+          )}
+          {hasActions && (
+            <View style={styles.actions}>
+              {onEdit && (
+                <TouchableOpacity onPress={onEdit} style={styles.actionBtn}>
+                  <Feather name="edit-2" size={14} color={theme.colors.primary.main} />
+                </TouchableOpacity>
+              )}
+              {onDelete && !confirmDelete && (
+                <TouchableOpacity onPress={() => setConfirmDelete(true)} style={styles.actionBtn}>
+                  <Feather name="trash-2" size={14} color={theme.colors.danger.main} />
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
         </View>
       </View>
 
-      <View style={styles.rightSection}>
-        <Typography variant="bold" size="lg" color={theme.colors.text.primary}>
-          {value} <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>{unit}</Typography>
-        </Typography>
-        {cost !== undefined && (
-          <Typography variant="regular" size="xs" color={theme.colors.text.secondary}>
-            R$ {cost.toFixed(2).replace('.', ',')}
+      {/* Confirmação inline de deleção */}
+      {confirmDelete && (
+        <View style={styles.confirmRow}>
+          <Typography variant="regular" size="xs" color={theme.colors.danger.main}>
+            Confirmar exclusão?
           </Typography>
-        )}
-      </View>
+          <View style={styles.confirmActions}>
+            <TouchableOpacity onPress={() => setConfirmDelete(false)} style={styles.confirmBtn}>
+              <Typography variant="medium" size="xs" color={theme.colors.text.secondary}>
+                Não
+              </Typography>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => { setConfirmDelete(false); onDelete?.(); }}
+              style={[styles.confirmBtn, styles.confirmBtnDanger]}
+            >
+              <Typography variant="medium" size="xs" color={theme.colors.text.primary}>
+                Sim, excluir
+              </Typography>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     backgroundColor: theme.colors.card.subCard,
     padding: theme.spacing.md,
     borderRadius: theme.borderRadius.md,
     marginBottom: theme.spacing.sm,
   },
-  leftSection: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md },
-  iconContainer: { width: 48, height: 48, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-  rightSection: { alignItems: 'flex-end' }
+  mainRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  leftSection: { flexDirection: "row", alignItems: "center", gap: theme.spacing.md, flex: 1 },
+  iconContainer: { width: 48, height: 48, borderRadius: 12, justifyContent: "center", alignItems: "center" },
+  rightSection: { alignItems: "flex-end" },
+  actions: { flexDirection: "row", gap: theme.spacing.sm, marginTop: 4 },
+  actionBtn: { padding: 4 },
+  confirmRow: {
+    marginTop: theme.spacing.sm,
+    paddingTop: theme.spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  confirmActions: { flexDirection: "row", gap: theme.spacing.sm },
+  confirmBtn: {
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 4,
+    borderRadius: theme.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  confirmBtnDanger: {
+    backgroundColor: theme.colors.danger.main,
+    borderColor: theme.colors.danger.main,
+  },
 });

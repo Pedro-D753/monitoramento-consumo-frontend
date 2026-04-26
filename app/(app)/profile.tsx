@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/Input";
 import { theme } from "@/config/Theme";
 import { useAuth } from "@/modules/auth/context/AuthContext";
 import { updateUser } from "@/modules/auth/services/AuthService";
+import { deleteUser } from "@/modules/auth/services/AuthService";
+import { storage } from "@/config/Storage";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -21,6 +23,9 @@ export default function ProfileScreen() {
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     setRealName(user?.real_name ?? "");
@@ -89,6 +94,28 @@ export default function ProfileScreen() {
       }
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setIsDeleting(true);
+      setDeleteError(null);
+      const refreshToken = await storage.getRefreshToken();
+      if (!refreshToken) throw new Error("Sessão inválida.");
+      await deleteUser(refreshToken);
+      await signOut();
+      router.replace("/(auth)/sign-in");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const detail = error.response?.data?.detail;
+        setDeleteError(typeof detail === "string" ? detail : "Não foi possível excluir a conta.");
+      } else {
+        setDeleteError("Não foi possível excluir a conta.");
+      }
+      setShowDeleteConfirm(false);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -279,22 +306,64 @@ export default function ProfileScreen() {
           </Typography>
         )}
 
-        <View style={styles.secondaryActions}>
+      <View style={styles.secondaryActions}>
+        <Button
+          title="Alterar Senha"
+          variant="outline"
+          onPress={() => router.push("/(app)/change-password")}
+          style={styles.changeButton}
+        />
+        <Button
+          title="Salvar Alterações"
+          variant="outline"
+          onPress={handleSaveProfile}
+          isLoading={isSaving}
+          disabled={!hasChanges}
+          style={styles.changeButton}
+        />
+
+        <Button
+          title="Sair da Conta"
+          onPress={handleLogout}
+          variant="danger"
+          style={styles.logoutButton}
+        />
+
+        {!showDeleteConfirm ? (
           <Button
-            title="Salvar Alteracoes"
-            variant="outline"
-            onPress={handleSaveProfile}
-            isLoading={isSaving}
-            disabled={!hasChanges}
-            style={styles.changeButton}
-          />
-          <Button
-            title="Sair da Conta"
-            onPress={handleLogout}
+            title="Excluir Conta"
             variant="danger"
+            onPress={() => setShowDeleteConfirm(true)}
             style={styles.logoutButton}
           />
-        </View>
+        ) : (
+          <View style={styles.confirmBox}>
+            <Typography variant="bold" size="sm" color={theme.colors.danger.main} align="center">
+              Isso é irreversível. Confirmar exclusão?
+            </Typography>
+            {deleteError && (
+              <Typography variant="regular" size="xs" color={theme.colors.danger.main} align="center">
+                {deleteError}
+              </Typography>
+            )}
+            <View style={styles.confirmRow}>
+              <Button
+                title="Cancelar"
+                variant="outline"
+                onPress={() => setShowDeleteConfirm(false)}
+                style={{ flex: 1 }}
+              />
+              <Button
+                title="Confirmar"
+                variant="danger"
+                onPress={handleDeleteAccount}
+                isLoading={isDeleting}
+                style={{ flex: 1 }}
+              />
+            </View>
+          </View>
+        )}
+      </View>
       </ScrollView>
     </PageLayout>
   );
@@ -380,10 +449,23 @@ const styles = StyleSheet.create({
   logoutButton: {
     width: "100%",
     borderColor: theme.colors.danger.main,
+    marginBottom: 20
   },
   changeButton: {
     width: "100%",
     marginTop: -15,
     marginVertical: 25,
   },
+  confirmBox: {
+    borderWidth: 1,
+    borderColor: theme.colors.danger.main,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
+},
+  confirmRow: {
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+},
 });

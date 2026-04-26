@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getTip } from '@/modules/tips/services/TipService';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { Typography } from '@/components/ui/Typography';
@@ -7,11 +8,19 @@ import { useRouter } from 'expo-router'
 
 interface HeaderProps {
     userName?: string;
-    tips?: string
+    tip?: string
 }
 
-export function Header({ userName = 'Usuário', tips = 'Continue se esforçando para economizar!' }: HeaderProps) {
+export function Header({ userName = 'Usuário'}: HeaderProps) {
     const router = useRouter()
+    const [tip, setTip] = useState('Continue se esforçando para economizar!');
+
+    useEffect(() => {
+      getTip('kwh')
+        .then((data) => setTip(data.tip))
+        .catch(() => {}); // Silencia: fallback já está no state
+    }, []);
+
     return (
         <View style={styles.container}>
             <View style={styles.topRow}>
@@ -37,7 +46,7 @@ export function Header({ userName = 'Usuário', tips = 'Continue se esforçando 
 
             <View style={styles.tips}>
                 <Typography variant='bold' size='lg'>Dica do dia:</Typography>
-                <Typography variant='regular' size='sm' style={styles.tipText}>{tips}</Typography>
+                <Typography variant='regular' size='sm' style={styles.tipText}>{tip}</Typography>
             </View>
             
         </View>

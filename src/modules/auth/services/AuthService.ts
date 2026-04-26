@@ -71,3 +71,20 @@ export const updateUser = async (
 export const logoutUser = async (refreshToken: string): Promise<void> => {
   await api.post(ENDPOINTS.auth.logout, { refresh_token: refreshToken });
 };
+
+export const forgotPassword = async (email: string): Promise<void> => {
+  await api.post(ENDPOINTS.auth.forgotPassword, { email });
+};
+
+export const resetPassword = async (newPassword: string, recoveryToken: string): Promise<void> => {
+  await api.post(ENDPOINTS.auth.resetPassword, {
+    new_password: newPassword,
+    recovery_token: recoveryToken,
+  });
+};
+
+export const deleteUser = async (refreshToken: string): Promise<void> => {
+  await api.delete(ENDPOINTS.auth.deleteUser, {
+    data: { refresh_token: refreshToken },
+  });
+};

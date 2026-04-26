@@ -11,6 +11,7 @@ type RetryableRequestConfig = InternalAxiosRequestConfig & {
 const NON_REFRESH_RETRY_PATHS = [
   ENDPOINTS.auth.login,
   ENDPOINTS.auth.register,
+  ENDPOINTS.auth.logout,  
   ENDPOINTS.auth.refreshToken,
   ENDPOINTS.auth.forgotPassword,
   ENDPOINTS.auth.resetPassword,
