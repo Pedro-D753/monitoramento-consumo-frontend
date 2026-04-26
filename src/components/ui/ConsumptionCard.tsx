@@ -7,24 +7,26 @@ import { theme } from '@/config/Theme';
 export type ConsumptionType = 'water' | 'energy' | 'gas' | 'money' | 'other';
 
 interface ConsumptionCardProps {
+  id: number;           // Novo: ID retornado da API
+  description?: string; // Novo: Nome customizado/Identificador opcional
   type: ConsumptionType;
   title: string;
-  value: number;  // Ex: 400 
-  unit: string;   // Ex: 'kWh' ou 'L'
-  date: string;   // Ex: "Hoje, 14:30"
-  cost?: number;  // Ex: 45.90 (opcional)
+  value: number;        // Ex: 400 
+  unit: string;         // Ex: 'kWh' ou 'L'
+  date: string;         // Ex: "Hoje, 14:30"
+  cost?: number;        // Ex: 45.90 (opcional)
 }
 
 // Um dicionário de mapeamento para os ícones e cores baseado no tipo de consumo
 const typeConfig = {
-  water: { icon: 'droplet', color: '#3498db' },    // Azul
-  energy: { icon: 'zap', color: '#f1c40f' },       // Amarelo
-  gas: { icon: 'wind', color: '#e74c3c' },         // Vermelho
-  money: { icon: 'money', color: '#0bc53a'},       // Verde
-  other: { icon: 'box', color: '#95a5a6' },        // Cinza
+  water: { icon: 'droplet', color: '#3498db' },       // Azul
+  energy: { icon: 'zap', color: '#f1c40f' },          // Amarelo
+  gas: { icon: 'wind', color: '#e74c3c' },            // Vermelho
+  money: { icon: 'dollar-sign', color: '#0bc53a'},    // Verde (Corrigido para dollar-sign)
+  other: { icon: 'box', color: '#95a5a6' },           // Cinza
 } as const;
 
-export function ConsumptionCard({ type, title, value, unit, date, cost }: ConsumptionCardProps) {
+export function ConsumptionCard({ id, description, type, title, value, unit, date, cost }: ConsumptionCardProps) {
   const config = typeConfig[type];
 
   return (
@@ -35,9 +37,12 @@ export function ConsumptionCard({ type, title, value, unit, date, cost }: Consum
         </View>
         
         <View>
-          <Typography variant="bold" size="md">{title}</Typography>
-          <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>
-            {date}
+          {/* Prioriza a descrição personalizada, senão usa o título da categoria */}
+          <Typography variant="bold" size="md">
+            {description ? description : title}
+          </Typography>
+          <Typography variant="regular" size="xs" color={theme.colors.text.secondary}>
+            ID: #{id} • {date}
           </Typography>
         </View>
       </View>

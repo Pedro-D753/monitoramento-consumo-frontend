@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 
 import { registerUser } from "@/modules/auth/services/AuthService";
 import { useSignUp } from "@/modules/auth/context/SignUpContext";
@@ -31,6 +32,7 @@ export default function SignThirdStep() {
     }
     try {
       setIsLoading(true);
+      setAuthError(null);
       await registerUser({
         email: contextData.email,
         real_name: contextData.real_name,
@@ -40,7 +42,19 @@ export default function SignThirdStep() {
       clearData();
       router.replace("/(auth)/sign-in");
     } catch (error) {
-      setAuthError("Ocorreu um erro ao criar a conta. Tente novamente.");
+      if (axios.isAxiosError(error)) {
+        const detail = error.response?.data?.detail;
+        const message =
+          typeof detail === "string"
+            ? detail
+            : Array.isArray(detail)
+              ? detail[0]?.msg || "Ocorreu um erro ao criar a conta."
+              : "Ocorreu um erro ao criar a conta.";
+
+        setAuthError(message);
+      } else {
+        setAuthError("Ocorreu um erro ao criar a conta. Tente novamente.");
+      }
       console.error("Erro no registro:", error);
     } finally {
       setIsLoading(false);

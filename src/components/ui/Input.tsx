@@ -13,7 +13,7 @@ import { theme } from "@/config/Theme";
 
 //Definindo as propriedades que o componente Input vai receber e tipando elas
 interface InputProps extends TextInputProps {
-  label: string;
+  label?: string;
   error?: string;
   isPassword?: boolean;
 }
@@ -72,7 +72,7 @@ export const Input = forwardRef<TextInput, InputProps>(
     const labelColor = animatedValue.interpolate({
       inputRange: [0, 1],
       outputRange: [
-        theme.colors.text.secondary,
+        theme.colors.text.disabled,
         isError
           ? theme.colors.danger.main
           : isFocused
@@ -85,19 +85,21 @@ export const Input = forwardRef<TextInput, InputProps>(
       <View style={[styles.wrapper, { opacity: isDisabled ? 0.5 : 1 }]}>
         <View style={[styles.inputContainer, { borderColor }]}>
           {/*Label com animação*/}
-          <Animated.Text
-            pointerEvents="none"
-            style={[
-              styles.label,
-              {
-                top: labelAxisY,
-                fontSize: labelFontSize,
-                color: labelColor,
-              },
-            ]}
-          >
-            {label}
-          </Animated.Text>
+            {label && (
+            <Animated.Text
+              pointerEvents="none"
+              style={[
+                styles.label,
+                {
+                  top: labelAxisY,
+                  fontSize: labelFontSize,
+                  color: labelColor,
+                },
+              ]}
+            >
+              {label}
+            </Animated.Text>
+          )}
 
           {/* input de texto */}
           <TextInput

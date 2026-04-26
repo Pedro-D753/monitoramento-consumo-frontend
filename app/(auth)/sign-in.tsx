@@ -1,17 +1,15 @@
-//Importando modulos e libs globais
 import { Text, StyleSheet } from "react-native";
+import { useState } from "react";
+import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "expo-router";
+import { useAuth } from "@/modules/auth/context/AuthContext";
 import { LoginFormData, loginSchema } from "@/modules/auth/schemas/LoginSchema";
 import { loginUser } from "@/modules/auth/services/AuthService";
-import { useRouter } from "expo-router";
-import axios from "axios";
-//Importando componentes e configs locais
-import { useAuth } from '@/modules/auth/context/AuthContext';
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { useState } from "react";
 import { theme } from "@/config/Theme";
 import { Typography } from "@/components/ui/Typography";
 
@@ -26,43 +24,42 @@ export default function SignInScreen() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema), // Integração do Zod com React Hook Form para validação
+    resolver: zodResolver(loginSchema),
   });
 
-const handleLogin = async (data: LoginFormData) => {
+  const handleLogin = async (data: LoginFormData) => {
     try {
-        setIsLoading(true);
-        setAuthError(null);
+      setIsLoading(true);
+      setAuthError(null);
 
-        const response = await loginUser(data);
-        
-        // ALERTA DE DEBUG:
-        if (!response.refresh_token) {
-            console.warn("SERVER REPORT: O FastAPI não enviou o refresh_token no payload de login!");
-        }
+      const response = await loginUser(data);
 
-        await signIn(response.access_token, response.refresh_token);
+      if (!response.access_token || !response.refresh_token) {
+        throw new Error("A resposta de login veio incompleta.");
+      }
 
-        router.replace('/(app)');
+      await signIn(response.access_token, response.refresh_token);
+      router.replace("/(app)");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-          const detail = error.response?.data?.detail;
-          
-          // Garante que a mensagem é sempre uma string
-          const message = typeof detail === 'string'
-              ? detail
-              : Array.isArray(detail)
-                  ? detail[0]?.msg || 'Credenciais inválidas.'
-                  : 'Credenciais inválidas.';
-          
-          setAuthError(message);
+        const detail = error.response?.data?.detail;
+        const message =
+          typeof detail === "string"
+            ? detail
+            : Array.isArray(detail)
+              ? detail[0]?.msg || "Credenciais inválidas."
+              : "Credenciais inválidas.";
+
+        setAuthError(message);
+      } else if (error instanceof Error) {
+        setAuthError(error.message);
       } else {
-          setAuthError('Ocorreu um erro inesperado.');
-      } 
-  } finally {
-      setIsLoading(false)
-  }
-};
+        setAuthError("Ocorreu um erro inesperado.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <AuthLayout

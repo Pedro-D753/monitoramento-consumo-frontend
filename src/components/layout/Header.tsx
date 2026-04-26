@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { Typography } from '@/components/ui/Typography';
 import { theme } from '@/config/Theme'
+import { useRouter } from 'expo-router'
 
 interface HeaderProps {
     userName?: string;
@@ -10,6 +11,7 @@ interface HeaderProps {
 }
 
 export function Header({ userName = 'Usuário', tips = 'Continue se esforçando para economizar!' }: HeaderProps) {
+    const router = useRouter()
     return (
         <View style={styles.container}>
             
@@ -33,7 +35,7 @@ export function Header({ userName = 'Usuário', tips = 'Continue se esforçando 
                 </View>
 
                 {/* Botão de config ou qualquer outra coisa */}
-                <TouchableOpacity style={styles.actionButton}>
+                <TouchableOpacity activeOpacity={0.8} style={styles.actionButton} onPress={() => router.push('/(app)/profile')}>
                     <Feather name='settings' size={20} color={theme.colors.text.primary}/>
                 </TouchableOpacity>
             </View>
@@ -41,7 +43,7 @@ export function Header({ userName = 'Usuário', tips = 'Continue se esforçando 
             {/* BASE: Dicas */}
             <View style={styles.tips}>
                 <Typography variant='bold' size='lg'>Dica do dia:</Typography>
-                <Typography variant='regular' size='md' style={styles.tipText}>{tips}</Typography>
+                <Typography variant='regular' size='sm' style={styles.tipText}>{tips}</Typography>
             </View>
             
         </View>
