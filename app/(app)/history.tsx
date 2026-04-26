@@ -64,18 +64,17 @@ export default function HistoryScreen() {
 
   const [editingRecord, setEditingRecord] = useState<ConsumptionRecord | null>(null);
 
-  const handleDelete = async (id: number) => {
-    try {
-      await deleteConsumo('real', id);
-      // Aguarda os dados novos do banco
-      await refetch();             
-      // Reaplica a configuração exata de filtros que o usuário está vendo na tela
-      handleApplyFilters(); 
-    } catch {
-      // Erro silencioso — o card já reverteu o estado de confirmação
-    }
-  };
-
+const handleDelete = async (id: number) => {
+  try {
+    // Mantemos o 'real' explícito conforme refatoramos no Service
+    await deleteConsumo('real', id);
+    await refetch();
+    handleApplyFilters(); // ← lê startDate/endDate/unit do closure atual — ok se estados não mudaram
+  } catch (error) {
+    console.error("Erro ao deletar consumo:", error);
+    // Opcional: Adicionar um Toast/Alert de erro aqui
+  }
+};
   const handleEditSuccess = async () => {
     setEditingRecord(null); // Fecha o modal de edição
     await refetch();        // Espera os dados novos e atualizados chegarem do backend
@@ -191,10 +190,10 @@ export default function HistoryScreen() {
                 key={consumo.id.toString()}
                 id={consumo.id}
                 description={consumo.description}
-                type={getCardType(consumo.measurement_unit)}
-                title={`Consumo de ${consumo.measurement_unit}`}
+                type={getCardType(consumo.si_measurement_unit)}
+                title={consumo.si_measurement_unit}
                 value={consumo.value}
-                unit={consumo.measurement_unit}
+                unit={consumo.si_measurement_unit}
                 date={dateStr}
                 onEdit={() => setEditingRecord(consumo)}       // ← novo
                 onDelete={() => handleDelete(consumo.id)}      // ← novo

@@ -9,6 +9,8 @@ import {
 } from '@expo-google-fonts/inter';
 import { AuthProvider, useAuth } from '@/modules/auth/context/AuthContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -52,10 +54,10 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>
-      <AuthProvider>
-        <InitialLayout fontsLoaded={fontsLoaded} fontError={fontError} />
-      </AuthProvider>
-    </SafeAreaProvider>
+        <SafeAreaProvider>
+          <AuthProvider>
+            <InitialLayout fontsLoaded={fontsLoaded} fontError={fontError} />
+          </AuthProvider>
+        </SafeAreaProvider>
   );
 }

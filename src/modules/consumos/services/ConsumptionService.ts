@@ -33,6 +33,12 @@ const DELETE_ENDPOINT_MAP: Record<EntryType, (id: number) => string> = {
   goal: ENDPOINTS.metas.deletar,
 };
 
+const LIST_ENDPOINT_MAP: Record<EntryType, string> = {
+  real: ENDPOINTS.consumos.listar,
+  simulation: ENDPOINTS.simulacoes.listar,
+  goal: ENDPOINTS.metas.listar,
+};
+
 export const editConsumo = async (
   type: EntryType,
   id: number,
@@ -53,11 +59,13 @@ export const deleteConsumo = async (
 };
 
 export const getConsumos = async (
-  filters?: ConsumptionFilters,
+  type: EntryType = "real", // Adicionado suporte a tipos mantendo compatibilidade com hooks antigos
+  filters: ConsumptionFilters = {},
 ): Promise<ConsumptionRecord[]> => {
-  const response = await api.get<ConsumptionRecord[]>(
-    ENDPOINTS.consumos.listar,
-    { data: filters  },
+  // Alterado para POST para suportar os schemas Pydantic de query via Body
+  const response = await api.post<ConsumptionRecord[]>(
+    LIST_ENDPOINT_MAP[type],
+    filters
   );
   return response.data;
 };

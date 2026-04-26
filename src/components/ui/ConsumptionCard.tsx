@@ -55,7 +55,7 @@ export function ConsumptionCard({
           <Typography variant="bold" size="lg">
             {value}{" "}
             <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>
-              {unit}
+              {unit?.toLowerCase() === 'r$' ? 'R$' : unit}
             </Typography>
           </Typography>
           {cost !== undefined && (
@@ -119,11 +119,40 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  leftSection: { flexDirection: "row", alignItems: "center", gap: theme.spacing.md, flex: 1 },
-  iconContainer: { width: 48, height: 48, borderRadius: 12, justifyContent: "center", alignItems: "center" },
-  rightSection: { alignItems: "flex-end" },
-  actions: { flexDirection: "row", gap: theme.spacing.sm, marginTop: 4 },
-  actionBtn: { padding: 4 },
+  leftSection: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    gap: theme.spacing.md, 
+    flex: 1,
+    marginRight: theme.spacing.sm // Dá uma margem de segurança entre texto e valor
+  },
+  iconContainer: { 
+    width: 48, 
+    height: 48, 
+    borderRadius: 12, 
+    justifyContent: "center", 
+    alignItems: "center" 
+  },
+  textContainer: {
+    flex: 1, // Impede o overflow horizontal
+  },
+  rightSection: { 
+    alignItems: "flex-end",
+    justifyContent: "center"
+  },
+  valueRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 4, // Espaçamento fixo ideal entre o número e a unidade
+  },
+  actions: { 
+    flexDirection: "row", 
+    gap: theme.spacing.sm, 
+    marginTop: 6 
+  },
+  actionBtn: { 
+    padding: 4 
+  },
   confirmRow: {
     marginTop: theme.spacing.sm,
     paddingTop: theme.spacing.sm,
@@ -133,7 +162,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  confirmActions: { flexDirection: "row", gap: theme.spacing.sm },
+  confirmActions: { 
+    flexDirection: "row", 
+    gap: theme.spacing.sm 
+  },
   confirmBtn: {
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: 4,
