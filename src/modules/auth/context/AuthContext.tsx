@@ -11,13 +11,14 @@ import {
   logoutUser,
   UserProfile,
 } from "../services/AuthService";
+import { boolean } from "zod";
 
 interface AuthContextData {
   user: UserProfile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   signIn: (accessToken: string, refreshToken: string) => Promise<void>;
-  signOut: () => Promise<void>;
+  signOut: (localOnly?: boolean) => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -66,20 +67,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const signOut = async () => {
+  const signOut = async (localOnly: boolean = false) => {
     try {
-      const refreshToken = await storage.getRefreshToken();
-
-      if (refreshToken) {
-        await logoutUser(refreshToken);
+      // Só tenta bater na API se NÃO for um logout estritamente local
+      if (!localOnly) {
+        const refreshToken = await storage.getRefreshToken();
+        if (refreshToken) {
+          await logoutUser(refreshToken);
+        }
       }
     } catch (error) {
       console.warn("Falha ao invalidar a sessão no servidor.", error);
     } finally {
+      // Limpa os tokens do dispositivo silenciosamente
       await storage.removeTokens();
       setUser(null);
     }
-  };
+  };;
 
   return (
     <AuthContext.Provider

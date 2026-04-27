@@ -31,10 +31,6 @@ let refreshPromise: Promise<string> | null = null;
 async function clearSessionAndRedirect() {
   await storage.removeTokens();
 
-  if (router.canGoBack()) {
-    router.dismissAll();
-  }
-
   router.replace("/(auth)/sign-in");
 }
 

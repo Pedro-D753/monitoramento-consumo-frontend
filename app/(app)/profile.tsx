@@ -74,7 +74,7 @@ export default function ProfileScreen() {
       const refreshToken = await storage.getRefreshToken();
       if (!refreshToken) throw new Error("Sessão inválida.");
       await deleteUser(refreshToken);
-      await signOut();
+      await signOut(true);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const detail = error.response?.data?.detail;
