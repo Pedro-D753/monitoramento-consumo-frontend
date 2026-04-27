@@ -23,7 +23,7 @@ export function SimulationLineChart({ data, isLoading }: SimulationLineChartProp
     >
       <LineChart
         data={data}
-        width={width - 80}
+        width={width - 140}
         height={180}
         curved
         curvature={0.2}

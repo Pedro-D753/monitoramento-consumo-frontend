@@ -5,7 +5,8 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 
-import { registerUser } from "@/modules/auth/services/AuthService";
+import { registerUser, loginUser } from "@/modules/auth/services/AuthService";
+import { useAuth } from "@/modules/auth/context/AuthContext";
 import { useSignUp } from "@/modules/auth/context/SignUpContext";
 import { SignUpStep3Data, signUpStep3Schema } from "@/modules/auth/schemas/SignUpSchema";
 import { Button } from "@/components/ui/Button";
@@ -19,6 +20,7 @@ export default function SignThirdStep() {
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const router = useRouter();
+  const { signIn } = useAuth();
   const { data: contextData, clearData } = useSignUp();
 
   const { control, handleSubmit, formState: { errors } } = useForm<SignUpStep3Data>({
@@ -30,27 +32,44 @@ export default function SignThirdStep() {
       setAuthError("Dados incompletos. Volte e preencha todos os campos.");
       return;
     }
+
     try {
       setIsLoading(true);
       setAuthError(null);
+
+      // 1. Cria a conta
       await registerUser({
         email: contextData.email,
         real_name: contextData.real_name,
         username: contextData.username,
-        password: formData.password, // confirm_password não é enviado
+        password: formData.password,
       });
-      router.replace('/(auth)/sign-in')
-      clearData();
+
+      // 2. Tenta auto-login imediato
+      try {
+        const loginResponse = await loginUser({
+          email: contextData.email,
+          password: formData.password,
+        });
+        clearData();
+        await signIn(loginResponse.access_token, loginResponse.refresh_token);
+        router.replace('/(app)');
+      } catch {
+        // Auto-login falhou: conta criada com sucesso, mas redireciona para login manual
+        clearData();
+        router.replace('/(auth)/sign-in');
+      }
+
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const detail = error.response?.data?.detail;
-        const message =
+        setAuthError(
           typeof detail === "string"
             ? detail
             : Array.isArray(detail)
               ? detail[0]?.msg || "Ocorreu um erro ao criar a conta."
-              : "Ocorreu um erro ao criar a conta.";
-        setAuthError(message);
+              : "Ocorreu um erro ao criar a conta.",
+        );
       } else {
         setAuthError("Ocorreu um erro ao criar a conta. Tente novamente.");
       }
@@ -63,9 +82,7 @@ export default function SignThirdStep() {
     <AuthLayout
       header={
         <View style={styles.card}>
-          <Typography variant="bold" size="md" style={styles.title}>
-            Quase lá!
-          </Typography>
+          <Typography variant="bold" size="md" style={styles.title}>Quase lá!</Typography>
           <StepIndicator totalSteps={3} currentStep={3} />
         </View>
       }
@@ -89,7 +106,6 @@ export default function SignThirdStep() {
           />
         )}
       />
-
       <Controller
         control={control}
         name="confirm_password"
@@ -113,11 +129,7 @@ export default function SignThirdStep() {
         </Typography>
       )}
 
-      <Button
-        title="Criar Conta"
-        onPress={handleSubmit(handleFinishSignUp)}
-        isLoading={isLoading}
-      />
+      <Button title="Criar Conta" onPress={handleSubmit(handleFinishSignUp)} isLoading={isLoading} />
     </AuthLayout>
   );
 }

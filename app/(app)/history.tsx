@@ -11,6 +11,7 @@ import { ConsumptionCard, ConsumptionType } from '@/components/ui/ConsumptionCar
 import { BottomSheetModal } from '@/components/ui/BottomSheetModal';
 import { theme } from '@/config/Theme';
 
+import { getUnitLabel } from '@/modules/consumos/utils/UnitUtils';
 import { useConsumptionHistory } from '@/modules/consumos/hooks/UseConsumptionHistory';
 import { ConsumptionRecord, formatDateToApi, parseApiDate } from '@/modules/consumos/schemas/ConsumptionSchema';
 import { EditConsumptionForm } from '@/modules/consumos/components/EditConsumptionForm';
@@ -147,7 +148,7 @@ export default function HistoryScreen() {
                   id={consumo.id}
                   description={consumo.description}
                   type={getCardType(consumo.si_measurement_unit)}
-                  title={consumo.si_measurement_unit}
+                  title={getUnitLabel(consumo.si_measurement_unit)}
                   value={consumo.value}
                   unit={consumo.si_measurement_unit}
                   date={dateStr}

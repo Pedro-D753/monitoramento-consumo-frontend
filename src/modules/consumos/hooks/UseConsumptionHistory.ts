@@ -1,7 +1,7 @@
+
 import { useState, useCallback } from "react";
 import { useFocusEffect } from "expo-router";
 import axios from "axios";
-import { theme } from "@/config/Theme";
 import {
   ConsumptionRecord,
   ChartDataPoint,
@@ -9,77 +9,7 @@ import {
   parseApiDate,
 } from "../schemas/ConsumptionSchema";
 import { getConsumos } from "../services/ConsumptionService";
-
-const getUnitColor = (unit: string): string => {
-  const normalizedUnit = unit.toLowerCase();
-  if (normalizedUnit.includes("r$")) {
-    return theme.colors.status.success;
-  }
-  if (normalizedUnit.includes("kwh") || normalizedUnit.includes("wh")) {
-    return theme.colors.status.warning;
-  }
-  if (normalizedUnit === "l" || normalizedUnit.includes("litro")) {
-    return theme.colors.status.info;
-  }
-  if (normalizedUnit.includes("m³") || normalizedUnit.includes("m3")) {
-    return theme.colors.primary.light;
-  }
-
-  return theme.colors.primary.main;
-};
-
-const formatToMonthlyChartData = (
-  records: ConsumptionRecord[],
-): ChartDataPoint[] => {
-  // A chave usa ano e mês para não misturar, por exemplo, jan/25 com jan/26.
-  const monthlyData: Record<
-    string,
-    ChartDataPoint & { sortKey: string; unitSignature: string }
-  > = {};
-
-  records
-    .slice()
-    .sort(
-      (left, right) =>
-        parseApiDate(left.ending_date).getTime() -
-        parseApiDate(right.ending_date).getTime(),
-    )
-    .forEach((record) => {
-      const date = parseApiDate(record.ending_date);
-      const sortKey = `${date.getFullYear()}-${String(
-        date.getMonth() + 1,
-      ).padStart(2, "0")}`;
-      const monthLabel = date
-        .toLocaleString("pt-BR", { month: "short" })
-        .replace(".", "");
-      const label = `${monthLabel.charAt(0).toUpperCase()}${monthLabel.slice(
-        1,
-      )}/${String(date.getFullYear()).slice(-2)}`;
-
-      if (!monthlyData[sortKey]) {
-        monthlyData[sortKey] = {
-          sortKey,
-          unitSignature: record.si_measurement_unit.toLowerCase(),
-          label,
-          value: 0,
-          frontColor: getUnitColor(record.si_measurement_unit),
-        };
-      } else if (
-        monthlyData[sortKey].unitSignature !==
-        record.si_measurement_unit.toLowerCase()
-      ) {
-        monthlyData[sortKey].frontColor = theme.colors.primary.main;
-      }
-
-      monthlyData[sortKey].value += record.value;
-    });
-
-  return Object.values(monthlyData)
-    .sort((left, right) => left.sortKey.localeCompare(right.sortKey))
-    .map(({ sortKey: _sortKey, unitSignature: _unitSignature, ...point }) => {
-      return point;
-    });
-};
+import { formatToMonthlyChartData } from "../utils/ChartUtils";
 
 export function useConsumptionHistory() {
   const [cachedData, setCachedData] = useState<ConsumptionRecord[]>([]);
