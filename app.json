@@ -11,11 +11,10 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/liquaLogo.webp",
+    "icon": "./src/assets/liquaLogo.png",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
     "splash": {
-      "image": "./src/assets/liquaLogo.webp",
+      "image": "./src/assets/liquaLogo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -48,7 +47,6 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {

@@ -10,7 +10,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "@/config/Theme";
 
-
 interface AuthLayoutProps {
   children: React.ReactNode;
   footer?: React.ReactNode;
@@ -21,7 +20,7 @@ export function AuthLayout({ children, footer, header }: AuthLayoutProps) {
   return (
     <ImageBackground
       resizeMode="cover"
-      source={require("@/assets/authBackground.webp")}
+      source={require("@/assets/authBackground.png")}
       style={styles.ImageBackground}
     >
       <SafeAreaView edges={["bottom"]} style={{ flex: 1 }}>
@@ -30,7 +29,7 @@ export function AuthLayout({ children, footer, header }: AuthLayoutProps) {
           style={styles.container}
         >
           <Image
-            source={require("@/assets/liquaLogo.webp")}
+            source={require("@/assets/liquaLogo.png")}
             style={styles.logo}
           />
           {header}
@@ -38,9 +37,7 @@ export function AuthLayout({ children, footer, header }: AuthLayoutProps) {
             contentContainerStyle={styles.content}
             keyboardShouldPersistTaps="handled"
           >
-            <View style={styles.card}>
-              {children}
-            </View>
+            <View style={styles.card}>{children}</View>
             {footer && (
               <View
                 style={{
