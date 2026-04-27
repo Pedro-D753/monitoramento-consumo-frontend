@@ -7,7 +7,8 @@
       "expo-router",
       "expo-font",
       "expo-secure-store",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-image"
     ],
     "version": "1.0.0",
     "orientation": "portrait",
@@ -40,24 +41,27 @@
               "pathPrefix": "/reset-password"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ],
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "foregroundImage": "./src/assets/liquaLogo.webp",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/liquaLogo.png"
     },
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "8c7f20c1-c91f-42f6-be42-e134e53012d3"
+        "projectId": "e85c32aa-df25-4bc8-b2fc-edcd5a7c9e20"
       }
     }
   }

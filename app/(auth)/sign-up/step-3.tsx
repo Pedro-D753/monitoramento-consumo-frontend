@@ -5,7 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 
-import { registerUser, loginUser } from "@/modules/auth/services/AuthService";
+import { registerUser } from "@/modules/auth/services/AuthService";
 import { useSignUp } from "@/modules/auth/context/SignUpContext";
 import { SignUpStep3Data, signUpStep3Schema } from "@/modules/auth/schemas/SignUpSchema";
 import { Button } from "@/components/ui/Button";
@@ -39,7 +39,7 @@ export default function SignThirdStep() {
         username: contextData.username,
         password: formData.password, // confirm_password não é enviado
       });
-      
+      router.replace('/(auth)/sign-in')
       clearData();
     } catch (error) {
       if (axios.isAxiosError(error)) {

@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { Tabs, Redirect } from 'expo-router';
+import { Tabs } from 'expo-router'; // <--- Remova o Redirect daqui
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@/modules/auth/context/AuthContext';
 import { theme } from '@/config/Theme';
-import { Typography } from '@/components/ui/Typography'; // Respeitando a regra de tipografia
+import { Typography } from '@/components/ui/Typography';
 
 export default function AppLayout() {
-    const { isAuthenticated, isLoading } = useAuth();
+    const { isLoading } = useAuth(); // <--- isAuthenticated removido daqui
 
     // 1. Estado de Carregamento Seguro (Splash)
     if (isLoading) {
@@ -16,11 +16,6 @@ export default function AppLayout() {
                 <ActivityIndicator size="large" color={theme.colors.primary.main} />
             </View>
         );
-    }
-
-    // 2. Proteção de Rota (Guarda)
-    if (!isAuthenticated) {
-        return <Redirect href="/(auth)/sign-in" />;
     }
 
     // 3. Renderização em Abas (Tabs) com UI Flutuante

@@ -72,7 +72,7 @@ export default function SimulationsScreen() {
               Nenhuma simulação ativa no momento.
             </Typography>
             <Typography variant="regular" size="sm" align="center" color={theme.colors.primary.main} style={{ marginTop: 8 }}>
-              Vá ao Dashboard e use o botão "Nova Simulação" para criar cenários.
+              Vá ao Dashboard e use o botão "Simulação" para criar cenários.
             </Typography>
           </View>
         ) : (

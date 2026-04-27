@@ -1,9 +1,7 @@
 import { api } from "@/config/Api";
-import { useRouter } from "expo-router";
 import { ENDPOINTS } from "@/config/Endpoints";
 import { LoginFormData } from "../schemas/LoginSchema";
 import { SignUpData } from "../schemas/SignUpSchema";
-const router = useRouter();
 export interface LoginResponse {
   access_token: string;
   refresh_token: string;

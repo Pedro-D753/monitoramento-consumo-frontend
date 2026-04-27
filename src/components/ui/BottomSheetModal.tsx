@@ -1,13 +1,14 @@
 import React from 'react';
-import { 
-  Modal, 
-  View, 
-  StyleSheet, 
-  TouchableOpacity, 
-  KeyboardAvoidingView, 
-  Platform 
+import {
+  Modal,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context'; 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '@/config/Theme';
 import { Typography } from './Typography';
 import { Feather } from '@expo/vector-icons';
@@ -22,30 +23,26 @@ interface BottomSheetModalProps {
 export function BottomSheetModal({ visible, onClose, title, children }: BottomSheetModalProps) {
   const insets = useSafeAreaInsets();
 
-  const safeBottomPadding = Platform.OS === 'android' && insets.bottom === 0 
-    ? 34 
-    : insets.bottom;
+  const safeBottomPadding =
+    Platform.OS === 'android' && insets.bottom === 0 ? 34 : insets.bottom;
 
   const bottomPadding = Math.max(safeBottomPadding, theme.spacing.lg) + theme.spacing.md;
 
   return (
-    <Modal 
-      visible={visible} 
-      animationType="slide" 
-      transparent={true} 
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={true}
       onRequestClose={onClose}
       statusBarTranslucent={true}
     >
-      <KeyboardAvoidingView 
-        style={styles.overlay} 
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
+      <KeyboardAvoidingView
+        style={styles.overlay}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={onClose} />
-        
-        <View style={[
-          styles.sheet, 
-          { paddingBottom: bottomPadding } 
-        ]}>
+
+        <View style={[styles.sheet, { paddingBottom: bottomPadding }]}>
           <View style={styles.header}>
             <Typography variant="bold" size="lg">{title}</Typography>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -53,9 +50,13 @@ export function BottomSheetModal({ visible, onClose, title, children }: BottomSh
             </TouchableOpacity>
           </View>
 
-          <View style={styles.content}>
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+          >
             {children}
-          </View>
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -88,5 +89,7 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 4,
   },
-  content: {}
+  scrollContent: {
+    paddingBottom: theme.spacing.sm,
+  },
 });

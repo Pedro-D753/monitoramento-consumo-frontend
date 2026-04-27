@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Dimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
 import { ChartDataPoint } from '@/modules/consumos/schemas/ConsumptionSchema';
 import { theme } from '@/config/Theme';
@@ -11,21 +10,20 @@ interface SimulationLineChartProps {
   isLoading?: boolean;
 }
 
-const screenWidth = Dimensions.get('window').width;
-
 export function SimulationLineChart({ data, isLoading }: SimulationLineChartProps) {
+  const { width } = useWindowDimensions();
   const isEmpty = data.length === 0;
 
   return (
-    <ChartContainer 
-      title="Simulação e Tendência" 
+    <ChartContainer
+      title="Simulação e Tendência"
       subtitle="Projeção do seu consumo"
       isLoading={isLoading}
       isEmpty={isEmpty}
     >
       <LineChart
         data={data}
-        width={screenWidth - 80}
+        width={width - 80}
         height={180}
         curved
         curvature={0.2}

@@ -10,12 +10,6 @@ import { useGoals } from '@/modules/consumos/hooks/UseGoals';
 import { useConsumptionHistory } from '@/modules/consumos/hooks/UseConsumptionHistory';
 import { ConsumptionRecord, parseApiDate } from '@/modules/consumos/schemas/ConsumptionSchema';
 
-interface GoalCardProps {
-  // ... suas props existentes (id, title, type, etc)
-  type: 'water' | 'electricity' | 'gas'; 
-  onDelete?: () => void; // Callback opcional
-}
-
 export default function GoalsScreen() {
   const { goals, isLoading: loadingGoals } = useGoals();
   const { rawData, isLoading: loadingHistory } = useConsumptionHistory();
@@ -34,9 +28,8 @@ export default function GoalsScreen() {
 
     const percentage = Math.min((currentSpent / goal.value) * 100, 100);
     const isOverLimit = currentSpent > goal.value;
-    const cType = (goal.si_measurement_unit.toLowerCase)
 
-    return { currentSpent, percentage, isOverLimit, cType };
+    return { currentSpent, percentage, isOverLimit };
   };
 
   const isLoading = loadingGoals || loadingHistory;
@@ -65,7 +58,7 @@ export default function GoalsScreen() {
               Você não possui nenhuma meta ativa.
             </Typography>
             <Typography variant="regular" size="sm" align="center" color={theme.colors.primary.main} style={{ marginTop: 8 }}>
-              Volte ao Dashboard e use o botão "+" para criar.
+              Volte ao Dashboard para criar.
             </Typography>
           </View>
         ) : (
