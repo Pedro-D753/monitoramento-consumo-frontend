@@ -26,7 +26,7 @@ export function BottomSheetModal({ visible, onClose, title, children }: BottomSh
   const [keyboardOffset, setKeyboardOffset] = useState(0);
 
   useEffect(() => {
-    // iOS dispara "Will" para animação suave; Android dispara "Did" (sem prévia)
+    // iOS: "Will" para animação suave | Android: "Did" (sem notificação prévia)
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
     const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
@@ -42,7 +42,7 @@ export function BottomSheetModal({ visible, onClose, title, children }: BottomSh
     };
   }, []);
 
-  // Reseta o offset quando o modal fecha (evita estado residual)
+  // Reseta offset ao fechar — evita estado residual na próxima abertura
   useEffect(() => {
     if (!visible) setKeyboardOffset(0);
   }, [visible]);
@@ -59,11 +59,14 @@ export function BottomSheetModal({ visible, onClose, title, children }: BottomSh
       onRequestClose={onClose}
       statusBarTranslucent={true}
     >
-      {/* View simples no lugar do KeyboardAvoidingView — posicionamento manual via marginBottom */}
+      {/* View pura: posicionamento via marginBottom ao invés de KeyboardAvoidingView */}
       <View style={styles.overlay}>
         <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={onClose} />
 
-        <View style={[styles.sheet, { paddingBottom: bottomPadding, marginBottom: keyboardOffset }]}>
+        <View style={[
+          styles.sheet,
+          { paddingBottom: bottomPadding, marginBottom: keyboardOffset }
+        ]}>
           <View style={styles.handle} />
 
           <View style={styles.header}>

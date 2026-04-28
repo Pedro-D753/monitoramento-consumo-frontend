@@ -25,6 +25,7 @@ export default function SignFistStep() {
 
   const {
     control,
+    setFocus,
     handleSubmit,
     formState: { errors },
   } = useForm<SignUpStep1Data>({
@@ -55,34 +56,39 @@ export default function SignFistStep() {
 
       <Controller
         control={control}
-        name="email"
-        render={({ field }) => (
-          <Input
-            label="E-mail"
-            autoCapitalize="none"
-            value={field.value}
-            onChangeText={field.onChange}
-            onBlur={field.onBlur}
-            ref={field.ref}
-            error={errors.email?.message}
-          />
-        )}
-      />
-      <Controller
-        control={control}
         name="real_name"
         render={({ field }) => (
           <Input
-            label="Nome"
-            autoCapitalize="words"
-            value={field.value}
-            onChangeText={field.onChange}
-            onBlur={field.onBlur}
-            ref={field.ref}
-            error={errors.real_name?.message}
+          label="Nome"
+          autoCapitalize="words"
+          value={field.value}
+          onChangeText={field.onChange}
+          onBlur={field.onBlur}
+          returnKeyType="next" 
+          blurOnSubmit={false} 
+          onSubmitEditing={() => setFocus('email')}
+          error={errors.real_name?.message}
           />
         )}
       />
+        <Controller
+          control={control}
+          name="email"
+          render={({ field }) => (
+            <Input
+              label="E-mail"
+              autoCapitalize="none"
+              value={field.value}
+              onChangeText={field.onChange}
+              onBlur={field.onBlur}
+              ref={field.ref}
+              returnKeyType="send" 
+              blurOnSubmit={false} 
+              onSubmitEditing={handleSubmit(handleNextStep)}
+              error={errors.email?.message}
+            />
+          )}
+        />
       <Button
         title="Avançar"
         onPress={handleSubmit(handleNextStep)}

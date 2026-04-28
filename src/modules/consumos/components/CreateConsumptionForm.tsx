@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
+import { storage } from "@/config/Storage";
 import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,7 +49,13 @@ export function CreateConsumptionForm({ type = "real", onSuccess }: Props) {
     setIsLoading(true);
     setErrorMsg(null);
     try {
-      await createConsumo(type, data);
+      const response = await createConsumo(type, data);
+
+      //TODO - integração com o DB para fazer isso no futuro
+      if (data.description) {
+        await storage.saveDescription(response.id, data.description);
+      }
+      
       onSuccess();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -68,6 +75,19 @@ export function CreateConsumptionForm({ type = "real", onSuccess }: Props) {
 
   return (
     <View style={styles.container}>
+      <Controller
+        control={control}
+        name="description"
+        render={({ field }) => (
+          <Input
+            label="Identificador (Opcional)"
+            placeholder="Ex: Conta de casa, Chuveiro..."
+            value={field.value}
+            onChangeText={field.onChange}
+            error={errors.description?.message}
+          />
+        )}
+      />
       <Controller
         control={control}
         name="si_measurement_unit"

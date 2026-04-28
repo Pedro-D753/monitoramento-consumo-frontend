@@ -20,7 +20,8 @@ export interface ConsumptionFilters {
 export interface ChartDataPoint {
   value: number;
   label: string;
-  frontColor: string;
+  frontColor?: string; // opcional: BarChart usa, LineChart ignora
+  dataPointColor?: string; // opcional: LineChart usa para colorir pontos individuais
 }
 
 // Mantém datas no calendário local para não deslocar o dia por UTC.
@@ -36,27 +37,45 @@ export const parseApiDate = (dateString: string): Date => {
   return new Date(year, month - 1, day);
 };
 
+// Importações omitidas (certifique-se de manter o import do 'z' e da função 'formatDateToApi')
+
 export const createConsumptionSchema = z
   .object({
+    description: z
+    .string()
+    .trim()
+    .optional(),
     starting_date: z
-      .date({ error: "A data de início é obrigatória" })
+      .date()
+      .refine((d) => d instanceof Date && !isNaN(d.getTime()), {
+        message: "A data de início é obrigatória",
+      })
       .transform(formatDateToApi),
+      
     ending_date: z
-      .date({ error: "A data de fim é obrigatória" })
+      .date()
+      .refine((d) => d instanceof Date && !isNaN(d.getTime()), {
+        message: "A data de fim é obrigatória",
+      })
       .transform(formatDateToApi),
+      
     si_measurement_unit: z
       .string()
       .trim()
-      .min(1, "A unidade é obrigatória"),
+      .min(1, { message: "A unidade é obrigatória" }),
+      
     value: z
       .string()
       .trim()
-      .min(1, "O valor é obrigatório")
+      .min(1, { message: "O valor é obrigatório" })
       .transform((val: string) => Number(val.replace(",", ".")))
-      .refine(
-        (val: number) => !isNaN(val) && val > 0,
-        "Valor deve ser maior que zero",
-      ),
+      .refine((val: number) => !isNaN(val) && val > 0, {
+        message: "Valor deve ser maior que zero",
+      })
+      // ✅ NOVA TRAVA FÍSICA: Máximo de 5 dígitos inteiros
+      .refine((val: number) => val <= 99999, {
+        message: "O valor máximo permitido é 99.999",
+      }),
   })
   .refine((data) => data.ending_date >= data.starting_date, {
     path: ["ending_date"],
@@ -64,16 +83,51 @@ export const createConsumptionSchema = z
   });
 
 export const editConsumptionSchema = z.object({
-  starting_date: z.date().optional(),
-  ending_date: z.date().optional(),
-  si_measurement_unit: z.string().trim().min(1, "Unidade obrigatória").optional(),
+  description: z
+  .string()
+  .trim()
+  .optional(),
+  starting_date: z
+    .date()
+    .refine((d) => d instanceof Date && !isNaN(d.getTime()), {
+      message: "Data de início inválida",
+    })
+    .optional(),
+    
+  ending_date: z
+    .date()
+    .refine((d) => d instanceof Date && !isNaN(d.getTime()), {
+      message: "Data de fim inválida",
+    })
+    .optional(),
+    
+  si_measurement_unit: z
+    .string()
+    .trim()
+    .min(1, { message: "Unidade obrigatória" })
+    .optional(),
+    
   value: z
     .string()
     .trim()
     .optional()
+    // 1. Valida se é um número válido e maior que zero
     .refine(
-      (val) => !val || (!isNaN(Number(val.replace(",", "."))) && Number(val.replace(",", ".")) > 0),
-      "Deve ser maior que zero",
+      (val) => {
+        if (!val) return true; // Se estiver vazio, passa (pois é opcional)
+        const num = Number(val.replace(",", "."));
+        return !isNaN(num) && num > 0;
+      },
+      { message: "Deve ser maior que zero" }
+    )
+    // 2. ✅ NOVA TRAVA FÍSICA: Converte internamente para checar o teto de 99.999
+    .refine(
+      (val) => {
+        if (!val) return true; 
+        const num = Number(val.replace(",", "."));
+        return num <= 99999;
+      },
+      { message: "O valor máximo permitido é 99.999" }
     ),
 });
 

@@ -3,6 +3,7 @@ import { View, StyleSheet } from "react-native";
 import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { storage } from "@/config/Storage";
 
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -41,6 +42,7 @@ export function EditConsumptionForm({ type, record, onSuccess, onCancel }: Props
   const { control, handleSubmit, formState: { errors } } = useForm<EditConsumptionFormData>({
     resolver: zodResolver(editConsumptionSchema),
     defaultValues: {
+      description: record.description ?? "",
       starting_date: parseApiDate(record.starting_date),
       ending_date: parseApiDate(record.ending_date),
       si_measurement_unit: record.si_measurement_unit,
@@ -59,7 +61,13 @@ export function EditConsumptionForm({ type, record, onSuccess, onCancel }: Props
         ...(data.si_measurement_unit && { new_si_measurement_unit: data.si_measurement_unit }),
         ...(data.value && { new_value: Number(data.value.replace(",", ".")) }),
       };
-      await editConsumo(type, record.id, payload);
+      const response = await editConsumo(type, record.id, payload);
+
+      //TODO - integração com o DB para fazer isso no futuro
+      if (data.description) {
+        await storage.saveDescription(response.id, data.description);
+      }
+
       onSuccess();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -77,6 +85,19 @@ export function EditConsumptionForm({ type, record, onSuccess, onCancel }: Props
 
   return (
     <View style={styles.container}>
+      <Controller
+        control={control}
+        name="description"
+        render={({ field }) => (
+          <Input
+            label="Identificador (Opcional)"
+            placeholder="Ex: Conta de casa, Chuveiro..."
+            value={field.value ?? ""}
+            onChangeText={field.onChange}
+            error={errors.description?.message}
+          />
+        )}
+      />
       <Controller
         control={control}
         name="si_measurement_unit"

@@ -8,6 +8,7 @@ interface TypographyProps extends TextProps {
   lineHeight?: keyof typeof theme.lineHeights;
   color?: string;
   align?: TextStyle['textAlign'];
+  hyphenate?: boolean;
 }
 
 export function Typography({
@@ -16,15 +17,21 @@ export function Typography({
   lineHeight = "normal",
   color,
   align = "left",
+  hyphenate = false,
   style,
   children,
   ...rest
 }: TypographyProps) {
   const fontSize = theme.fontSizes[size];
   const calculatedLineHeight = fontSize * theme.lineHeights[lineHeight];
+  const hyphenationProps = hyphenate ? {
+    hyphenationFactor: 1, // iOS
+    textBreakStrategy: "balanced" as const, // Android
+  } : {};
 
   return (
     <Text
+      {...hyphenationProps}
       style={[
         {
           fontFamily: theme.fonts[variant],

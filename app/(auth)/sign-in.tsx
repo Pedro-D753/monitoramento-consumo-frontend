@@ -22,6 +22,7 @@ export default function SignInScreen() {
   const {
     control,
     handleSubmit,
+    setFocus,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -86,6 +87,9 @@ export default function SignInScreen() {
             onChangeText={field.onChange}
             onBlur={field.onBlur}
             ref={field.ref}
+            returnKeyType="next" 
+            blurOnSubmit={false} 
+            onSubmitEditing={() => setFocus('password')}
             error={errors.email?.message}
           />
         )}
@@ -100,6 +104,9 @@ export default function SignInScreen() {
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
+            returnKeyType="next" 
+            blurOnSubmit={false} 
+            onSubmitEditing={handleSubmit(handleLogin)}
             ref={field.ref}
             isPassword={true}
             error={errors.password?.message}

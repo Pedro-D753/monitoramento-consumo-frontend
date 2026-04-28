@@ -2,6 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 
 const ACCESS_TOKEN_KEY = 'liqua_access_token';
 const REFRESH_TOKEN_KEY = 'liqua_refresh_token';
+const DESCRIPTIONS_CACHE_KEY = 'liqua_desc_cache'; //temporario
 
 export const storage = {
   async saveTokens(accessToken: string, refreshToken: string): Promise<void> {
@@ -24,5 +25,17 @@ export const storage = {
       SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
       SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
     ]);
+  },
+  
+  // ✅ NOVAS FUNÇÕES DE CACHE LOCAL (TODO: Remover quando DB suportar)
+  async saveDescription(id: number, description: string): Promise<void> {
+    const existing = await this.getDescriptions();
+    existing[id] = description;
+    await SecureStore.setItemAsync(DESCRIPTIONS_CACHE_KEY, JSON.stringify(existing));
+  },
+
+  async getDescriptions(): Promise<Record<number, string>> {
+    const data = await SecureStore.getItemAsync(DESCRIPTIONS_CACHE_KEY);
+    return data ? JSON.parse(data) : {};
   }
 };

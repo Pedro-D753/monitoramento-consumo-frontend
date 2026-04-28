@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Dimensions, useWindowDimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 import { ChartDataPoint } from '@/modules/consumos/schemas/ConsumptionSchema';
 import { theme } from '@/config/Theme';
@@ -10,8 +10,6 @@ interface ConsumptionBarChartProps {
   data: ChartDataPoint[];
   isLoading?: boolean;
 }
-
-const screenWidth = Dimensions.get('window').width;
 
 export function ConsumptionBarChart({ data, isLoading }: ConsumptionBarChartProps) {
   const { width } = useWindowDimensions();

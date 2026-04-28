@@ -11,6 +11,7 @@ import { ConsumptionCard, ConsumptionType } from '@/components/ui/ConsumptionCar
 import { BottomSheetModal } from '@/components/ui/BottomSheetModal';
 import { theme } from '@/config/Theme';
 
+import { ViewSelector, ViewType } from '@/components/ui/ViewSelector';
 import { getUnitLabel } from '@/modules/consumos/utils/UnitUtils';
 import { useConsumptionHistory } from '@/modules/consumos/hooks/UseConsumptionHistory';
 import { ConsumptionRecord, formatDateToApi, parseApiDate } from '@/modules/consumos/schemas/ConsumptionSchema';
@@ -37,6 +38,10 @@ export default function HistoryScreen() {
   const [chartType, setChartType] = useState<'bar' | 'line'>('bar');
   const [editingRecord, setEditingRecord] = useState<ConsumptionRecord | null>(null);
 
+  const handleViewChange = (view: ViewType) => {
+    if (view !== 'history') router.replace(`/(app)/${view}`);
+  };
+
   const handleApplyFilters = () => {
     applyLocalFilters({
       starting_date: startDate ? formatDateToApi(startDate) : undefined,
@@ -49,7 +54,6 @@ export default function HistoryScreen() {
     try {
       await deleteConsumo('real', id);
       await refetch();
-      handleApplyFilters();
     } catch (err) {
       console.error('Erro ao deletar consumo:', err);
     }
@@ -58,12 +62,23 @@ export default function HistoryScreen() {
   const handleEditSuccess = async () => {
     setEditingRecord(null);
     await refetch();
-    handleApplyFilters();
+  };
+  const handleClearFilters = () => {
+    // 1. Limpa os estados visuais da tela
+    setStartDate(undefined);
+    setEndDate(undefined);
+    setUnit('');
+    
+    // 2. Avisa ao Hook de consumos para remover qualquer filtro aplicado
+    applyLocalFilters({});
   };
 
   return (
     <>
       <PageLayout showHeader={false}>
+
+        <ViewSelector activeView="history" onSelect={handleViewChange} />
+
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
@@ -96,6 +111,7 @@ export default function HistoryScreen() {
             style={styles.chartTouchable}
           >
             {chartType === 'bar' ? (
+              // Simples e limpo. A variável data já está formatada pelo hook!
               <ConsumptionBarChart data={data} isLoading={isLoading} />
             ) : (
               <SimulationLineChart data={data} isLoading={isLoading} />
@@ -112,6 +128,7 @@ export default function HistoryScreen() {
           onEndDateChange={setEndDate}
           onUnitChange={setUnit}
           onApply={handleApplyFilters}
+          onClear={handleClearFilters}
         />
 
         {error && (

@@ -80,6 +80,9 @@ export default function ForgotPasswordScreen() {
             autoCapitalize="none"
             keyboardType="email-address"
             value={value}
+            returnKeyType="send" 
+            blurOnSubmit={false} 
+            onSubmitEditing={handleSubmit(onSubmit)}
             onChangeText={onChange}
             error={errors.email?.message}
           />

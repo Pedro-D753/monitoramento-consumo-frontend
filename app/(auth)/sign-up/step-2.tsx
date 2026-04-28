@@ -60,6 +60,9 @@ export default function SignSecondStep() {
             onChangeText={field.onChange}
             onBlur={field.onBlur}
             ref={field.ref}
+            returnKeyType="next" 
+            blurOnSubmit={false} 
+            onSubmitEditing={handleSubmit(handleNextStep)}
             error={errors.username?.message}
           />
         )}

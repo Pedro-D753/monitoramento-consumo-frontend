@@ -34,26 +34,41 @@ export function ConsumptionCard({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const hasActions = !!onEdit || !!onDelete;
 
+  // ✅ FORMATAÇÃO LIMPA: Remove ".00" inúteis e adiciona pontuação de milhar (ex: 20000 -> 20.000)
+  const formattedValue = new Intl.NumberFormat('pt-BR', {
+    maximumFractionDigits: 2,
+  }).format(value);
+
   return (
     <View style={styles.card}>
       <View style={styles.mainRow}>
+        
+        {/* LADO ESQUERDO: Texto descritivo (Ocupa até 60% do espaço) */}
         <View style={styles.leftSection}>
           <View style={[styles.iconContainer, { backgroundColor: config.color + '20' }]}>
             <Feather name={config.icon as any} size={24} color={config.color} />
           </View>
-          <View>
-            <Typography variant="bold" size="md">
+          
+          <View style={styles.textContainer}>
+            <Typography 
+              variant="bold" 
+              size="md" 
+              numberOfLines={2} 
+              ellipsizeMode="tail" 
+              hyphenate 
+            >
               {(description ?? title).toUpperCase()}
             </Typography>
-            <Typography variant="regular" size="xs" color={theme.colors.text.secondary}>
-              ID: #{id} • {date}
+            <Typography variant="regular" size="xs" color={theme.colors.text.secondary} numberOfLines={1}>
+              #{id} • {date}
             </Typography>
           </View>
         </View>
 
+        {/* LADO DIREITO: Valor e botões (Ocupa até 40% do espaço) */}
         <View style={styles.rightSection}>
-          <Typography variant="bold" size="lg">
-            {value}{" "}
+          <Typography variant="bold" size="lg" numberOfLines={1} adjustsFontSizeToFit>
+            {formattedValue}{" "}
             <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>
               {unit?.toLowerCase() === 'kwh' ? 'kWh' : 
                 unit?.toLowerCase() === 'l' || 
@@ -62,11 +77,13 @@ export function ConsumptionCard({
                 unit?.toUpperCase() : unit }
             </Typography>
           </Typography>
+          
           {cost !== undefined && (
             <Typography variant="regular" size="xs" color={theme.colors.text.secondary}>
               R$ {cost.toFixed(2).replace(".", ",")}
             </Typography>
           )}
+          
           {hasActions && (
             <View style={styles.actions}>
               {onEdit && (
@@ -92,17 +109,13 @@ export function ConsumptionCard({
           </Typography>
           <View style={styles.confirmActions}>
             <TouchableOpacity onPress={() => setConfirmDelete(false)} style={styles.confirmBtn}>
-              <Typography variant="medium" size="xs" color={theme.colors.text.secondary}>
-                Não
-              </Typography>
+              <Typography variant="medium" size="xs" color={theme.colors.text.secondary}>Não</Typography>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => { setConfirmDelete(false); onDelete?.(); }}
               style={[styles.confirmBtn, styles.confirmBtnDanger]}
             >
-              <Typography variant="medium" size="xs" color={theme.colors.text.primary}>
-                Sim, excluir
-              </Typography>
+              <Typography variant="medium" size="xs" color={theme.colors.text.primary}>Sim, excluir</Typography>
             </TouchableOpacity>
           </View>
         </View>
@@ -121,14 +134,15 @@ const styles = StyleSheet.create({
   mainRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "center", 
   },
   leftSection: { 
     flexDirection: "row", 
     alignItems: "center", 
     gap: theme.spacing.md, 
-    flex: 1,
-    marginRight: theme.spacing.sm // Dá uma margem de segurança entre texto e valor
+    flex: 1, 
+    maxWidth: '65%', // 🛡️ BARREIRA FÍSICA: Nunca passará da metade da tela
+    paddingRight: theme.spacing.sm 
   },
   iconContainer: { 
     width: 48, 
@@ -138,25 +152,20 @@ const styles = StyleSheet.create({
     alignItems: "center" 
   },
   textContainer: {
-    flex: 1, // Impede o overflow horizontal
+    flex: 1, // 🛡️ VITAL: Passa o limite do maxWidth para o Typography saber onde cortar o texto
   },
   rightSection: { 
     alignItems: "flex-end",
-    justifyContent: "center"
-  },
-  valueRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    gap: 4, // Espaçamento fixo ideal entre o número e a unidade
+    justifyContent: "center",
+    flexShrink: 0, 
+    maxWidth: '40%', // 🛡️ BARREIRA FÍSICA: Protege o valor de ser esmagado
   },
   actions: { 
     flexDirection: "row", 
     gap: theme.spacing.sm, 
     marginTop: 6 
   },
-  actionBtn: { 
-    padding: 4 
-  },
+  actionBtn: { padding: 4 },
   confirmRow: {
     marginTop: theme.spacing.sm,
     paddingTop: theme.spacing.sm,
@@ -166,10 +175,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  confirmActions: { 
-    flexDirection: "row", 
-    gap: theme.spacing.sm 
-  },
+  confirmActions: { flexDirection: "row", gap: theme.spacing.sm },
   confirmBtn: {
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: 4,

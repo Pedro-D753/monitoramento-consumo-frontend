@@ -3,6 +3,7 @@ import { z } from "zod";
 export const loginSchema = z.object({
   email: z
     .string()
+    .toLowerCase()
     .trim()
     .min(1, "Email é obrigatório")
     .email("Formato de email inválido"),

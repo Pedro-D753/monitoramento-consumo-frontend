@@ -23,7 +23,7 @@ export default function SignThirdStep() {
   const { signIn } = useAuth();
   const { data: contextData, clearData } = useSignUp();
 
-  const { control, handleSubmit, formState: { errors } } = useForm<SignUpStep3Data>({
+  const { control, handleSubmit, setFocus, formState: { errors } } = useForm<SignUpStep3Data>({
     resolver: zodResolver(signUpStep3Schema),
   });
 
@@ -37,7 +37,6 @@ export default function SignThirdStep() {
       setIsLoading(true);
       setAuthError(null);
 
-      // 1. Cria a conta
       await registerUser({
         email: contextData.email,
         real_name: contextData.real_name,
@@ -45,17 +44,17 @@ export default function SignThirdStep() {
         password: formData.password,
       });
 
-      // 2. Tenta auto-login imediato
+      // Auto-login: tenta entrar automaticamente após cadastro
       try {
         const loginResponse = await loginUser({
           email: contextData.email,
           password: formData.password,
         });
-        clearData();
+        clearData(); // Limpa ANTES de navegar
         await signIn(loginResponse.access_token, loginResponse.refresh_token);
         router.replace('/(app)');
       } catch {
-        // Auto-login falhou: conta criada com sucesso, mas redireciona para login manual
+        // Fallback: cadastro OK, mas auto-login falhou (rede instável, etc.)
         clearData();
         router.replace('/(auth)/sign-in');
       }
@@ -94,41 +93,33 @@ export default function SignThirdStep() {
         control={control}
         name="password"
         render={({ field }) => (
-          <Input
-            label="Senha"
-            autoCapitalize="none"
-            value={field.value}
-            onChangeText={field.onChange}
-            onBlur={field.onBlur}
-            isPassword
+          <Input label="Senha" autoCapitalize="none" value={field.value}
+            onChangeText={field.onChange} onBlur={field.onBlur} isPassword
             ref={field.ref}
-            error={errors.password?.message}
-          />
+            returnKeyType="next" 
+            blurOnSubmit={false} 
+            onSubmitEditing={() => setFocus('confirm_password')}
+            error={errors.password?.message} />
         )}
       />
       <Controller
         control={control}
         name="confirm_password"
         render={({ field }) => (
-          <Input
-            label="Confirmar Senha"
-            autoCapitalize="none"
-            value={field.value}
-            onChangeText={field.onChange}
-            onBlur={field.onBlur}
-            isPassword
-            ref={field.ref}
-            error={errors.confirm_password?.message}
-          />
+          <Input label="Confirmar Senha" autoCapitalize="none" value={field.value}
+            onChangeText={field.onChange} onBlur={field.onBlur} isPassword
+            ref={field.ref} 
+            returnKeyType="send" 
+            blurOnSubmit={false} 
+            onSubmitEditing={handleSubmit(handleFinishSignUp)}
+            error={errors.confirm_password?.message} />
         )}
       />
-
       {authError && (
         <Typography variant="regular" size="sm" style={styles.errorText}>
           {authError}
         </Typography>
       )}
-
       <Button title="Criar Conta" onPress={handleSubmit(handleFinishSignUp)} isLoading={isLoading} />
     </AuthLayout>
   );
@@ -139,16 +130,11 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: theme.colors.card.subCard,
     borderRadius: theme.borderRadius.md,
-    width: "95%",
-    maxWidth: 400,
-    alignSelf: "center",
-    alignItems: "center",
+    width: "95%", maxWidth: 400,
+    alignSelf: "center", alignItems: "center",
   },
   errorText: {
-    color: theme.colors.danger.main,
-    fontSize: 12,
-    maxWidth: 220,
-    textAlign: "center",
-    marginBottom: theme.spacing.sm,
+    color: theme.colors.danger.main, fontSize: 12,
+    maxWidth: 220, textAlign: "center", marginBottom: theme.spacing.sm,
   },
 });

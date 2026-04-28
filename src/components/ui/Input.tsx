@@ -128,6 +128,8 @@ export const Input = forwardRef<TextInput, InputProps>(
   },
 );
 
+Input.displayName = 'Input';
+
 const styles = StyleSheet.create({
   wrapper: {
     width: "100%",

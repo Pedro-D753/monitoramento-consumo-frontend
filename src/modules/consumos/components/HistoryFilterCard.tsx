@@ -23,6 +23,7 @@ interface HistoryFilterCardProps {
   onEndDateChange: (date: Date) => void;
   onUnitChange: (unit: string) => void;
   onApply: () => void;
+  onClear: () => void;
 }
 
 export function HistoryFilterCard({
@@ -33,6 +34,7 @@ export function HistoryFilterCard({
   onStartDateChange,
   onEndDateChange,
   onUnitChange,
+  onClear,
   onApply,
 }: HistoryFilterCardProps) {
   return (
@@ -68,12 +70,21 @@ export function HistoryFilterCard({
         placeholder="Selecione..."
       />
 
-      <Button
-        title="Aplicar Filtros"
-        onPress={onApply}
-        isLoading={isLoading}
-        style={styles.button}
-      />
+      <View style={styles.buttonArea}>
+        <Button 
+          title="Limpar" 
+          variant="outline"
+          isLoading={isLoading}
+          style={styles.button} 
+          onPress={onClear} 
+        />
+        <Button 
+          title="Aplicar" 
+          isLoading={isLoading}
+          style={styles.button} 
+          onPress={onApply} 
+        />
+      </View>
     </View>
   );
 }
@@ -99,8 +110,13 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: theme.spacing.xs,
   },
+  buttonArea: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   button: {
     marginTop: theme.spacing.sm,
-    width: '100%',
+    width: '47%',
   },
 });

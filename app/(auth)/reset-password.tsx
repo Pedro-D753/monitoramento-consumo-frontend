@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Alert } from "react-native";
+import { StyleSheet, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +25,7 @@ export default function ResetPasswordScreen() {
   const {
     control,
     handleSubmit,
+    setFocus,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(changePasswordSchema),
@@ -112,6 +113,9 @@ export default function ResetPasswordScreen() {
             label="Nova Senha"
             isPassword
             value={value}
+            returnKeyType="next" 
+            blurOnSubmit={false} 
+            onSubmitEditing={() => setFocus('confirm_password')}
             onChangeText={onChange}
             error={errors.new_password?.message}
           />
@@ -126,6 +130,9 @@ export default function ResetPasswordScreen() {
             label="Confirmar Nova Senha"
             isPassword
             value={value}
+            returnKeyType="next" 
+            blurOnSubmit={false} 
+            onSubmitEditing={handleSubmit(onSubmit)}
             onChangeText={onChange}
             error={errors.confirm_password?.message}
           />

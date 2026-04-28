@@ -2,6 +2,7 @@
 import { useState, useCallback } from "react";
 import { useFocusEffect } from "expo-router";
 import axios from "axios";
+import { storage } from "@/config/Storage"; // Importe o storage
 import {
   ConsumptionRecord,
   ChartDataPoint,
@@ -18,15 +19,23 @@ export function useConsumptionHistory() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-const fetchHistory = useCallback(async () => {
+  const fetchHistory = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
       const raw = await getConsumos("real");
-      setCachedData(raw);
-      setFilteredData(raw);
-      setChartData(formatToMonthlyChartData(raw));
+      
+      // ✅ TODO FUTURE: Remover este cruzamento de dados quando o Backend enviar a "description"
+      const localDescriptions = await storage.getDescriptions();
+      const mergedData = raw.map(item => ({
+        ...item,
+        description: localDescriptions[item.id] || item.description
+      }));
+
+      setCachedData(mergedData);
+      setFilteredData(mergedData);
+      setChartData(formatToMonthlyChartData(mergedData));
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const detail = err.response?.data?.detail;

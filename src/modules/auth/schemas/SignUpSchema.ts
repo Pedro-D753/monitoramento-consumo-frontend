@@ -3,6 +3,8 @@ import { z } from "zod";
 export const signUpStep1Schema = z.object({
   email: z
     .string()
+    .trim()
+    .toLowerCase()
     .min(1, "O email é obrigatório")
     .email("Formato de email inválido"),
   real_name: z
@@ -14,6 +16,7 @@ export const signUpStep1Schema = z.object({
 export const signUpStep2Schema = z.object({
   username: z
     .string()
+    .trim()
     .min(1, "O nome de usuário é obrigatório")
     .min(3, "O nome de usuário deve conter no mínimo 3 caracteres")
     .max(16, "O nome de usuário deve conter no máximo 16 caracteres")

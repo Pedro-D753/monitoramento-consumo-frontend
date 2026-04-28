@@ -1,29 +1,25 @@
 import React from 'react';
-import { useWindowDimensions } from 'react-native';
+import { Dimensions } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
 import { ChartDataPoint } from '@/modules/consumos/schemas/ConsumptionSchema';
 import { theme } from '@/config/Theme';
 import { ChartContainer } from './ChartContainer';
 
+// ✅ 1. Atualizamos a interface aqui também
 interface SimulationLineChartProps {
-  data: ChartDataPoint[];
+  data: ChartDataPoint[]; 
   isLoading?: boolean;
 }
 
-export function SimulationLineChart({ data, isLoading }: SimulationLineChartProps) {
-  const { width } = useWindowDimensions();
-  const isEmpty = data.length === 0;
+const screenWidth = Dimensions.get('window').width;
 
+// ✅ 2. Aplicamos a interface
+export function SimulationLineChart({ data, isLoading }: SimulationLineChartProps) {
   return (
-    <ChartContainer
-      title="Simulação e Tendência"
-      subtitle="Projeção do seu consumo"
-      isLoading={isLoading}
-      isEmpty={isEmpty}
-    >
+    <ChartContainer title="Simulação e Tendência" subtitle="Projeção do seu consumo" isLoading={isLoading} isEmpty={data.length === 0}>
       <LineChart
         data={data}
-        width={width - 140}
+        width={screenWidth - 80}
         height={180}
         curved
         curvature={0.2}

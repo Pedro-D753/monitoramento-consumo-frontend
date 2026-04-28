@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useRouter } from 'expo-router';
-import { View, StyleSheet} from 'react-native';
+import { View, StyleSheet } from 'react-native';
 
+import { Toast } from '@/components/ui/Toast';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { BottomSheetModal } from '@/components/ui/BottomSheetModal';
 import { ActionCard } from '@/components/ui/ActionCard';
@@ -18,8 +19,12 @@ export default function DashboardScreen() {
   const router = useRouter();
   const { data, rawData, isLoading, refetch } = useConsumptionHistory(); 
   const [modalType, setModalType] = useState<EntryType | null>(null);
+  
+  // Estados para o sistema de Toast
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
-  const currentMonthTotal = useMemo(() => {
+const currentMonthTotal = useMemo(() => {
     const today = new Date();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
@@ -32,21 +37,37 @@ export default function DashboardScreen() {
         
         return isMoney && isThisMonth;
       })
-      .reduce((acc, item) => acc + item.value, 0);
+      .reduce((acc, item) => acc + (Number(item.value) || 0), 0);
   }, [rawData]);
 
-    const formattedTotal = currentMonthTotal.toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    });
+  const formattedTotal = currentMonthTotal.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  });
 
   const handleSuccess = () => {
+    // 1. Define a mensagem dinâmica com base no tipo de modal que estava aberto
+    let message = "Operação realizada com sucesso!";
+    if (modalType === 'real') message = "Consumo registrado com sucesso!";
+    if (modalType === 'simulation') message = "Simulação criada com sucesso!";
+    if (modalType === 'goal') message = "Meta definida com sucesso!";
+
+    // 2. Aciona o Toast e atualiza os dados
+    setToastMessage(message);
+    setShowToast(true);
     setModalType(null);
     refetch();
   };
 
   return (
     <>
+      {/* Componente Toast renderizado no topo para flutuar sobre a UI */}
+      <Toast 
+        visible={showToast} 
+        message={toastMessage} 
+        onHide={() => setShowToast(false)} 
+      />
+
       <PageLayout>
         <View style={styles.summaryCard}>
           <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>
@@ -135,7 +156,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     gap: theme.spacing.md,
-    marginTop: theme.spacing.minusSM,
+    marginTop: theme.spacing.minusSM, // assumindo que você tem isso no theme
   },
   column: {
     flex: 1,
