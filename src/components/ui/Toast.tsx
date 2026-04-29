@@ -11,27 +11,39 @@ interface ToastProps {
 }
 
 export function Toast({ visible, message, onHide }: ToastProps) {
-  const opacity = useRef(new Animated.Value(0)).current;
+  const opacity    = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(-20)).current;
 
   useEffect(() => {
-    if (visible) {
-      // Animação de entrada fluida (Fade + Slide)
-      Animated.parallel([
-        Animated.timing(opacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-        Animated.spring(translateY, { toValue: 0, speed: 12, useNativeDriver: true })
-      ]).start();
+    if (!visible) return;
 
-      // Tempo na tela (2.5 segundos) e animação de saída
-      const timer = setTimeout(() => {
-        Animated.parallel([
-          Animated.timing(opacity, { toValue: 0, duration: 300, useNativeDriver: true }),
-          Animated.timing(translateY, { toValue: -20, duration: 300, useNativeDriver: true })
-        ]).start(() => onHide());
-      }, 2500);
+    // ✅ Bug #11: Rastreia montagem para evitar setState em componente desmontado
+    let isMounted = true;
 
-      return () => clearTimeout(timer);
-    }
+    const entryAnimation = Animated.parallel([
+      Animated.timing(opacity,    { toValue: 1, duration: 300, useNativeDriver: true }),
+      Animated.spring(translateY, { toValue: 0, speed: 12,     useNativeDriver: true }),
+    ]);
+    entryAnimation.start();
+
+    const timer = setTimeout(() => {
+      const exitAnimation = Animated.parallel([
+        Animated.timing(opacity,    { toValue: 0,   duration: 300, useNativeDriver: true }),
+        Animated.timing(translateY, { toValue: -20, duration: 300, useNativeDriver: true }),
+      ]);
+      exitAnimation.start(() => {
+        if (isMounted) onHide();
+      });
+    }, 2500);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+      entryAnimation.stop(); // Para animação de entrada pendente
+      // Reseta valores para próxima exibição
+      opacity.setValue(0);
+      translateY.setValue(-20);
+    };
   }, [visible]);
 
   if (!visible) return null;
@@ -49,7 +61,7 @@ export function Toast({ visible, message, onHide }: ToastProps) {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: 60, // Logo abaixo do Header
+    top: 60,
     alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
@@ -63,12 +75,12 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   iconContainer: {
-    backgroundColor: '#0bc53a', // Verde Sucesso
+    backgroundColor: '#0bc53a',
     borderRadius: 12,
     width: 24,
     height: 24,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
-  }
+  },
 });

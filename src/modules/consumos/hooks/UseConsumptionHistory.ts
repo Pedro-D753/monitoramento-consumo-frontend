@@ -1,8 +1,7 @@
-
-import { useState, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useFocusEffect } from "expo-router";
 import axios from "axios";
-import { storage } from "@/config/Storage"; // Importe o storage
+import { descriptionCache } from "@/config/DescriptionCache";
 import {
   ConsumptionRecord,
   ChartDataPoint,
@@ -12,79 +11,84 @@ import {
 import { getConsumos } from "../services/ConsumptionService";
 import { formatToMonthlyChartData } from "../utils/ChartUtils";
 
-export function useConsumptionHistory() {
-  const [cachedData, setCachedData] = useState<ConsumptionRecord[]>([]);
-  const [filteredData, setFilteredData] = useState<ConsumptionRecord[]>([]);
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const STALE_MS = 15_000;
 
-  const fetchHistory = useCallback(async () => {
+export function useConsumptionHistory() {
+  const [cachedData, setCachedData]   = useState<ConsumptionRecord[]>([]);
+  const [filteredData, setFilteredData] = useState<ConsumptionRecord[]>([]);
+  const [chartData, setChartData]     = useState<ChartDataPoint[]>([]);
+  const [isLoading, setIsLoading]     = useState(true);
+  const [error, setError]             = useState<string | null>(null);
+  const lastFetchRef                  = useRef<number>(0);
+
+  const fetchHistory = useCallback(async (force = false) => {
+    const now = Date.now();
+    if (!force && now - lastFetchRef.current < STALE_MS && cachedData.length > 0) {
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
       const raw = await getConsumos("real");
-      
-      // ✅ TODO FUTURE: Remover este cruzamento de dados quando o Backend enviar a "description"
-      const localDescriptions = await storage.getDescriptions();
-      const mergedData = raw.map(item => ({
+      const localDescriptions = await descriptionCache.getAll();
+      const mergedData = raw.map((item) => ({
         ...item,
-        description: localDescriptions[item.id] || item.description
+        description: localDescriptions[item.id] || item.description,
       }));
 
       setCachedData(mergedData);
       setFilteredData(mergedData);
       setChartData(formatToMonthlyChartData(mergedData));
+      lastFetchRef.current = Date.now();
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        const detail = err.response?.data?.detail;
-        let errorMessage = "Falha ao carregar dados.";
-          // 404 cai aqui e vira mensagem de erro na tela
-          if (err.response?.status === 404) {
-            setCachedData([]);
-            setFilteredData([]);
-            setChartData([]);
-            return; // Lista vazia é estado válido, não erro
-          }
-
-        if (typeof detail === 'string') {
-            errorMessage = detail;
-        } else if (Array.isArray(detail)) {
-            // Se for o erro 422 do FastAPI, pegamos a mensagem do primeiro erro
-            errorMessage = detail[0]?.msg || "Falha na validação dos dados.";
+        if (err.response?.status === 404) {
+          setCachedData([]);
+          setFilteredData([]);
+          setChartData([]);
+          return;
         }
-        
-        setError(errorMessage);
+        const detail = err.response?.data?.detail;
+        setError(
+          typeof detail === "string"
+            ? detail
+            : Array.isArray(detail)
+              ? detail[0]?.msg || "Falha na validação dos dados."
+              : "Falha ao carregar dados.",
+        );
       } else {
         setError("Falha ao carregar dados.");
       }
     } finally {
       setIsLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const refetch = useCallback(async () => {
+    await fetchHistory(true);
+  }, [fetchHistory]);
 
   const applyLocalFilters = useCallback(
     (filters: ConsumptionFilters) => {
-      // Os filtros são aplicados localmente sobre o cache já carregado da API.
       let result = [...cachedData];
+
       if (filters.si_measurement_unit) {
-        const targetUnit = filters.si_measurement_unit.trim().toLowerCase();
+        const target = filters.si_measurement_unit.trim().toLowerCase();
         result = result.filter(
-          (i) => i.si_measurement_unit.trim().toLowerCase() === targetUnit
+          (i) => i.si_measurement_unit.trim().toLowerCase() === target,
         );
       }
       if (filters.starting_date) {
         const start = parseApiDate(filters.starting_date).getTime();
-        result = result.filter(
-          (i) => parseApiDate(i.ending_date).getTime() >= start,
-        );
+        result = result.filter((i) => parseApiDate(i.ending_date).getTime() >= start);
       }
       if (filters.ending_date) {
         const end = parseApiDate(filters.ending_date).getTime();
-        result = result.filter(
-          (i) => parseApiDate(i.ending_date).getTime() <= end,
-        );
+        result = result.filter((i) => parseApiDate(i.ending_date).getTime() <= end);
       }
       if (filters.minimum_value !== undefined) {
         result = result.filter((i) => i.value >= filters.minimum_value!);
@@ -92,16 +96,17 @@ export function useConsumptionHistory() {
       if (filters.maximum_value !== undefined) {
         result = result.filter((i) => i.value <= filters.maximum_value!);
       }
+
       setFilteredData(result);
       setChartData(formatToMonthlyChartData(result));
     },
     [cachedData],
   );
 
-useFocusEffect(
+  useFocusEffect(
     useCallback(() => {
-      fetchHistory();
-    }, [fetchHistory])
+      fetchHistory(false);
+    }, [fetchHistory]),
   );
 
   return {
@@ -109,7 +114,7 @@ useFocusEffect(
     rawData: filteredData,
     isLoading,
     error,
-    refetch: fetchHistory,
+    refetch,
     applyLocalFilters,
   };
 }

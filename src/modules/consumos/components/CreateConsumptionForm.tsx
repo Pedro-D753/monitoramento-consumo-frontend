@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { storage } from "@/config/Storage";
 import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Typography } from "@/components/ui/Typography";
 import { DatePickerInput } from "@/components/ui/DatePickerInput";
 import { SelectInput } from "@/components/ui/SelectInput";
 import { theme } from "@/config/Theme";
+import { descriptionCache } from "@/config/DescriptionCache";
 import {
   createConsumptionSchema,
   CreateConsumptionFormInput,
@@ -24,23 +25,21 @@ interface Props {
 
 const UNIT_OPTIONS = [
   { label: "Energia (kWh)", value: "kWh" },
-  { label: "Água (L)", value: "L" },
-  { label: "Gás (m³)", value: "m³" },
-  { label: "Dinheiro (R$)", value: "R$" },
-  { label: "Outros...", value: "custom" },
+  { label: "Água (L)",      value: "L"   },
+  { label: "Gás (m³)",      value: "m³"  },
+  { label: "Dinheiro (R$)", value: "R$"  },
+  { label: "Outros...",     value: "custom" },
 ];
 
 export function CreateConsumptionForm({ type = "real", onSuccess }: Props) {
   const [isCustomUnit, setIsCustomUnit] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isLoading, setIsLoading]       = useState(false);
+  const [errorMsg, setErrorMsg]         = useState<string | null>(null);
 
   const {
-    control,
-    handleSubmit,
-    setValue,
+    control, handleSubmit, setValue,
     formState: { errors },
-  } = useForm<CreateConsumptionFormInput, any, CreateConsumptionFormOutput>({
+  } = useForm<CreateConsumptionFormInput, unknown, CreateConsumptionFormOutput>({
     resolver: zodResolver(createConsumptionSchema),
     defaultValues: { si_measurement_unit: "", value: "" },
   });
@@ -51,11 +50,12 @@ export function CreateConsumptionForm({ type = "real", onSuccess }: Props) {
     try {
       const response = await createConsumo(type, data);
 
-      //TODO - integração com o DB para fazer isso no futuro
-      if (data.description) {
-        await storage.saveDescription(response.id, data.description);
+      // Persiste descrição localmente (não vai para a API — veja ConsumptionService)
+      const description = (data as CreateConsumptionFormOutput & { description?: string }).description;
+      if (description) {
+        await descriptionCache.save(response.id, description);
       }
-      
+
       onSuccess();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -63,7 +63,7 @@ export function CreateConsumptionForm({ type = "real", onSuccess }: Props) {
         setErrorMsg(
           Array.isArray(detail)
             ? detail[0]?.msg || "Não foi possível salvar o registro."
-            : detail || "Não foi possível salvar o registro.",
+            : detail         || "Não foi possível salvar o registro.",
         );
       } else {
         setErrorMsg("Não foi possível salvar o registro.");
@@ -82,12 +82,13 @@ export function CreateConsumptionForm({ type = "real", onSuccess }: Props) {
           <Input
             label="Identificador (Opcional)"
             placeholder="Ex: Conta de casa, Chuveiro..."
-            value={field.value}
+            value={field.value ?? ""}
             onChangeText={field.onChange}
             error={errors.description?.message}
           />
         )}
       />
+
       <Controller
         control={control}
         name="si_measurement_unit"
@@ -100,21 +101,13 @@ export function CreateConsumptionForm({ type = "real", onSuccess }: Props) {
               onSelect={(val) => {
                 if (val === "custom") {
                   setIsCustomUnit(true);
-                  setValue("si_measurement_unit", "", {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  });
+                  setValue("si_measurement_unit", "", { shouldDirty: true, shouldValidate: true });
                 } else {
                   setIsCustomUnit(false);
-                  setValue("si_measurement_unit", val, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  });
+                  setValue("si_measurement_unit", val, { shouldDirty: true, shouldValidate: true });
                 }
               }}
-              error={
-                !isCustomUnit ? errors.si_measurement_unit?.message : undefined
-              }
+              error={!isCustomUnit ? errors.si_measurement_unit?.message : undefined}
             />
             {isCustomUnit && (
               <Input
@@ -181,6 +174,7 @@ export function CreateConsumptionForm({ type = "real", onSuccess }: Props) {
           {errorMsg}
         </Typography>
       )}
+
       <Button
         title="Confirmar"
         onPress={handleSubmit(onSubmit)}
@@ -192,24 +186,9 @@ export function CreateConsumptionForm({ type = "real", onSuccess }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    paddingVertical: theme.spacing.md,
-  },
-  row: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  flexItem: {
-    flex: 1,
-  },
-  submitButton: {
-    width: "100%",
-    marginTop: theme.spacing.md,
-  },
-  errorText: {
-    color: theme.colors.danger.main,
-    textAlign: "center",
-    marginVertical: theme.spacing.sm,
-  },
+  container:    { width: "100%", paddingVertical: theme.spacing.md },
+  row:          { flexDirection: "row", gap: 10 },
+  flexItem:     { flex: 1 },
+  submitButton: { width: "100%", marginTop: theme.spacing.md },
+  errorText:    { color: theme.colors.danger.main, textAlign: "center", marginVertical: theme.spacing.sm },
 });

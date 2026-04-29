@@ -1,25 +1,33 @@
 import React from 'react';
-import { Dimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
 import { ChartDataPoint } from '@/modules/consumos/schemas/ConsumptionSchema';
 import { theme } from '@/config/Theme';
 import { ChartContainer } from './ChartContainer';
 
-// ✅ 1. Atualizamos a interface aqui também
 interface SimulationLineChartProps {
-  data: ChartDataPoint[]; 
+  data: ChartDataPoint[];
   isLoading?: boolean;
 }
 
-const screenWidth = Dimensions.get('window').width;
-
-// ✅ 2. Aplicamos a interface
 export function SimulationLineChart({ data, isLoading }: SimulationLineChartProps) {
+  // ✅ Bug #5: useWindowDimensions reativo (reagia a rotação/split-screen)
+  const { width } = useWindowDimensions();
+  const isEmpty   = data.length === 0;
+
+  // Remove frontColor dos itens: é prop exclusiva do BarChart
+  const lineData = data.map(({ frontColor: _fc, dataPointColor: _dc, ...rest }) => rest);
+
   return (
-    <ChartContainer title="Simulação e Tendência" subtitle="Projeção do seu consumo" isLoading={isLoading} isEmpty={data.length === 0}>
+    <ChartContainer
+      title="Simulação e Tendência"
+      subtitle="Projeção do seu consumo"
+      isLoading={isLoading}
+      isEmpty={isEmpty}
+    >
       <LineChart
-        data={data}
-        width={screenWidth - 80}
+        data={lineData}
+        width={width - 80}
         height={180}
         curved
         curvature={0.2}

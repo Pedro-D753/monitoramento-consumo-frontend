@@ -1,8 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { useFocusEffect } from 'expo-router';
 import { ConsumptionRecord } from '../schemas/ConsumptionSchema';
-import { storage } from '@/config/Storage';
+import { descriptionCache } from '@/config/DescriptionCache';
 import {
   getConsumos,
   deleteConsumo,
@@ -10,6 +10,9 @@ import {
   EditConsumptionPayload,
   EntryType,
 } from '../services/ConsumptionService';
+
+/** Tempo mínimo entre fetches automáticos (ao focar a tela) */
+const STALE_MS = 15_000; // 15 segundos
 
 interface UseEntriesResult {
   entries: ConsumptionRecord[];
@@ -20,67 +23,79 @@ interface UseEntriesResult {
 }
 
 export function useEntries(type: EntryType): UseEntriesResult {
-  const [entries, setEntries] = useState<ConsumptionRecord[]>([]);
+  const [entries, setEntries]     = useState<ConsumptionRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const lastFetchRef              = useRef<number>(0);
 
-  const fetchEntries = useCallback(async () => {
+  const fetchEntries = useCallback(async (force = false) => {
+    const now = Date.now();
+    // ✅ Bug #9: Ignora re-fetch se os dados ainda são "frescos" e não é forçado
+    if (!force && now - lastFetchRef.current < STALE_MS && entries.length > 0) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
       const data = await getConsumos(type);
 
-      // ✅ TODO FUTURE: Remover este cruzamento de dados quando o Backend enviar a "description"
-      const localDescriptions = await storage.getDescriptions();
-      const mergedData = data.map(item => ({
+      // ✅ Bug #16: Usa o singleton descriptionCache em vez de chamar storage diretamente
+      const localDescriptions = await descriptionCache.getAll();
+      const mergedData = data.map((item) => ({
         ...item,
-        description: localDescriptions[item.id] || item.description
+        description: localDescriptions[item.id] || item.description,
       }));
 
-      // 🎯 Correção: Salvar o mergedData no estado, não o data original
       setEntries(mergedData);
+      lastFetchRef.current = Date.now();
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 404) {
-        // 404 = lista vazia = estado válido
         setEntries([]);
       } else {
-        // Outros erros: lista vazia mas loga para debug
         console.error(`Erro ao buscar entradas do tipo "${type}":`, err);
         setEntries([]);
       }
     } finally {
       setIsLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
+
+  /** Força um novo fetch, ignorando o stale time (usar após mutations) */
+  const refetch = useCallback(async () => {
+    await fetchEntries(true);
+  }, [fetchEntries]);
 
   const removeEntry = useCallback(async (id: number): Promise<void> => {
     await deleteConsumo(type, id);
-    
-    // Atualização otimista: remove da lista imediatamente
     setEntries((prev) => prev.filter((entry) => entry.id !== id));
   }, [type]);
 
   const updateEntry = useCallback(
     async (id: number, payload: EditConsumptionPayload): Promise<ConsumptionRecord> => {
       const updated = await editConsumo(type, id, payload);
-      
-      // ✅ 🎯 Re-aplica a descrição do cache no objeto atualizado, 
-      // para evitar que ela suma da tela após a edição otimista
-      const localDescriptions = await storage.getDescriptions();
+
+      // Re-aplica a descrição local para não desaparecer após a edição
+      const localDescriptions = await descriptionCache.getAll();
       const mergedUpdated = {
-          ...updated,
-          description: localDescriptions[updated.id] || updated.description
+        ...updated,
+        description: localDescriptions[updated.id] || updated.description,
       };
 
-      setEntries((prev) => prev.map((entry) => (entry.id === id ? mergedUpdated : entry)));
+      setEntries((prev) =>
+        prev.map((entry) => (entry.id === id ? mergedUpdated : entry)),
+      );
       return mergedUpdated;
     },
     [type],
   );
 
+  // useFocusEffect respeita o stale time para evitar double fetch
   useFocusEffect(
     useCallback(() => {
-      fetchEntries();
+      fetchEntries(false);
     }, [fetchEntries]),
   );
 
-  return { entries, isLoading, refetch: fetchEntries, removeEntry, updateEntry };
+  return { entries, isLoading, refetch, removeEntry, updateEntry };
 }
