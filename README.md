@@ -1,20 +1,14 @@
 ***
 
 ```markdown
-<div align="center">
-  <img src="src/assets/liquaLogo.png" alt="Liqua Logo" width="150"/>
 
   # Liqua - Monitoramento de Consumo
 
   O **Liqua** é um aplicativo móvel avançado para monitoramento, controle financeiro e simulação de gastos utilitários (Água, Energia, Gás). Desenvolvido com foco em performance e *Mobile-First*.
 
-  ![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-  ![Expo](https://img.shields.io/badge/Expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white)
-  ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-
-</div>
-
-<br/>
+  ![React Native]
+  ![Expo]
+  ![TypeScript]
 
 ## 📖 Visão Geral
 
