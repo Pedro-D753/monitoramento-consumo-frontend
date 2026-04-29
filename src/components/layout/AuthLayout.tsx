@@ -1,3 +1,8 @@
+/**
+ * Layout autenticação com background, logo, form card.
+ * KeyboardAvoiding + Scroll.
+ */
+
 import {
   ImageBackground,
   KeyboardAvoidingView,
@@ -9,7 +14,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "@/config/Theme";
-
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -38,9 +42,7 @@ export function AuthLayout({ children, footer, header }: AuthLayoutProps) {
             contentContainerStyle={styles.content}
             keyboardShouldPersistTaps="handled"
           >
-            <View style={styles.card}>
-              {children}
-            </View>
+            <View style={styles.card}>{children}</View>
             {footer && (
               <View
                 style={{

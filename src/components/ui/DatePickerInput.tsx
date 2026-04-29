@@ -1,14 +1,33 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, StyleSheet, Text, Platform } from 'react-native';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { Feather } from '@expo/vector-icons';
-import { theme } from '@/config/Theme';
+/**
+ * Input seletor de data com picker nativo.
+ * Display formatted pt-BR.
+ * Android auto-hide.
+ */
+
+import React, { useState } from "react";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+  Platform,
+} from "react-native";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import { Feather } from "@expo/vector-icons";
+import { theme } from "@/config/Theme";
 
 interface DatePickerInputProps {
+  /** Label descritivo */
   label: string;
+  /** Data selecionada */
   value: Date | undefined;
-  customValue?: string
+  /** Valor custom display */
+  customValue?: string;
+  /** Callback mudança data */
   onChange: (date: Date) => void;
+  /** Mensagem erro */
   error?: string;
 }
 
@@ -22,33 +41,46 @@ export function DatePickerInput({
   const [show, setShow] = useState(false);
 
   const onChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    if (Platform.OS === 'android') setShow(false);
-    
+    if (Platform.OS === "android") setShow(false);
+
     if (selectedDate) {
       onChange(selectedDate);
     }
   };
 
-  const displayValue = value ? value.toLocaleDateString('pt-BR') : '';
+  const displayValue = value ? value.toLocaleDateString("pt-BR") : "";
   const isError = !!error;
   const borderColor = isError ? theme.colors.danger.main : theme.colors.border;
 
   return (
     <View style={styles.wrapper}>
-      <TouchableOpacity 
-        style={[styles.inputContainer, { borderColor }]} 
+      <TouchableOpacity
+        style={[styles.inputContainer, { borderColor }]}
         activeOpacity={0.7}
         onPress={() => setShow(true)}
       >
-        <Text style={[styles.label, { color: value ? theme.colors.text.secondary : theme.colors.text.disabled }]}>
+        <Text
+          style={[
+            styles.label,
+            {
+              color: value
+                ? theme.colors.text.secondary
+                : theme.colors.text.disabled,
+            },
+          ]}
+        >
           {label}
         </Text>
-        
+
         <View style={styles.valueRow}>
           <Text style={styles.valueText}>
-            {displayValue ? displayValue : (customValue ? customValue : "Selecione uma data")}
+            {displayValue || (customValue ? customValue : "Selecione uma data")}
           </Text>
-          <Feather name="calendar" size={20} color={theme.colors.text.secondary} />
+          <Feather
+            name="calendar"
+            size={20}
+            color={theme.colors.text.secondary}
+          />
         </View>
       </TouchableOpacity>
 
@@ -85,9 +117,9 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   valueRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   valueText: {
     color: theme.colors.text.neutral,

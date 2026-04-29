@@ -1,9 +1,16 @@
+/**
+ * Indicador de passos horizontais com circles + lines.
+ * Active state com scale/shadow.
+ */
+
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { theme } from "@/config/Theme";
 
 interface StepIndicatorProps {
+  /** Total passos */
   totalSteps: number;
+  /** Passo atual */
   currentStep: number;
 }
 

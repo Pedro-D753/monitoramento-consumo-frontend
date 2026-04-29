@@ -1,3 +1,9 @@
+/**
+ * Context de autenticação global.
+ * Gerencia estado de user, login/logout, storage de tokens.
+ * Lazy loading na inicialização.
+ */
+
 import React, {
   createContext,
   useCallback,
@@ -6,27 +12,33 @@ import React, {
   useState,
 } from "react";
 import { storage } from "@/config/Storage";
-import {
-  getUserInfo,
-  logoutUser,
-  UserProfile,
-} from "../services/AuthService";
+import { getUserInfo, logoutUser, UserProfile } from "../services/AuthService";
 
 interface AuthContextData {
+  /** Perfil do usuário logado */
   user: UserProfile | null;
+  /** Flag de autenticação ativa */
   isAuthenticated: boolean;
+  /** Loading inicial/auth */
   isLoading: boolean;
+  /** Login com tokens */
   signIn: (accessToken: string, refreshToken: string) => Promise<void>;
+  /** Logout (local ou server) */
   signOut: (localOnly?: boolean) => Promise<void>;
+  /** Refresh perfil user */
   refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData | undefined>(undefined);
 
+/**
+ * Provider principal de auth.
+ * Carrega sessão do storage na init.
+ */
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser]           = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshUser = useCallback(async () => {
@@ -35,6 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   useEffect(() => {
+    /** Carrega tokens do storage e valida user na inicialização */
     async function loadStorageData() {
       try {
         const token = await storage.getAccessToken();
@@ -50,7 +63,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     loadStorageData();
   }, [refreshUser]);
 
-  const signIn = async (accessToken: string, refreshToken: string): Promise<void> => {
+  const signIn = async (
+    accessToken: string,
+    refreshToken: string,
+  ): Promise<void> => {
     await storage.saveTokens(accessToken, refreshToken);
     try {
       await refreshUser();
@@ -61,7 +77,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // ✅ Bug #2: Duplo ponto-e-vírgula removido
   const signOut = async (localOnly: boolean = false): Promise<void> => {
     try {
       if (!localOnly) {
@@ -78,13 +93,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: !!user, isLoading, signIn, signOut, refreshUser }}
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        signIn,
+        signOut,
+        refreshUser,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
 
+/**
+ * Hook para consumir auth context.
+ * Throw error se usado fora do Provider.
+ */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

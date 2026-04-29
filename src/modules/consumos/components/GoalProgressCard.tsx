@@ -1,3 +1,8 @@
+/**
+ * Card progresso meta com bar custom, confirm delete.
+ * Dynamic bar color by %/over.
+ */
+
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
@@ -16,23 +21,29 @@ interface GoalProgressCardProps {
 }
 
 export function GoalProgressCard({
-  goal, currentSpent, percentage, isOverLimit, onEdit, onDelete,
+  goal,
+  currentSpent,
+  percentage,
+  isOverLimit,
+  onEdit,
+  onDelete,
 }: GoalProgressCardProps) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   let barColor = theme.colors.primary.main;
   if (percentage >= 85 && !isOverLimit) barColor = theme.colors.status.warning;
-  if (isOverLimit)                       barColor = theme.colors.danger.main;
+  if (isOverLimit) barColor = theme.colors.danger.main;
 
-  const endDate   = parseApiDate(goal.ending_date).toLocaleDateString('pt-BR');
+  const endDate = parseApiDate(goal.ending_date).toLocaleDateString('pt-BR');
   const unitLabel = getUnitLabel(goal.si_measurement_unit);
 
   return (
     <View style={styles.card}>
-      {/* Cabeçalho com título e ações */}
       <View style={styles.header}>
         <View style={styles.headerText}>
-          <Typography variant="bold" size="lg">Meta de {unitLabel}</Typography>
+          <Typography variant="bold" size="lg">
+            Meta de {unitLabel}
+          </Typography>
           <Typography variant="regular" size="xs" color={theme.colors.text.secondary}>
             Válida até {endDate}
           </Typography>
@@ -51,7 +62,6 @@ export function GoalProgressCard({
         </View>
       </View>
 
-      {/* Progresso numérico */}
       <View style={styles.progressTextRow}>
         <Typography
           variant="medium"
@@ -65,18 +75,23 @@ export function GoalProgressCard({
         </Typography>
       </View>
 
-      {/* Barra de progresso */}
       <View style={styles.progressBarBg}>
-        <View style={[styles.progressBarFill, { width: `${percentage}%`, backgroundColor: barColor }]} />
+        <View
+          style={[styles.progressBarFill, { width: `${percentage}%`, backgroundColor: barColor }]}
+        />
       </View>
 
       {isOverLimit && (
-        <Typography variant="regular" size="xs" color={theme.colors.danger.main} style={styles.overLimitText}>
+        <Typography
+          variant="regular"
+          size="xs"
+          color={theme.colors.danger.main}
+          style={styles.overLimitText}
+        >
           Atenção: Você ultrapassou o limite projetado!
         </Typography>
       )}
 
-      {/* Confirmação de exclusão inline */}
       {confirmDelete && (
         <View style={styles.confirmRow}>
           <Typography variant="regular" size="xs" color={theme.colors.danger.main}>
@@ -84,13 +99,20 @@ export function GoalProgressCard({
           </Typography>
           <View style={styles.confirmActions}>
             <TouchableOpacity onPress={() => setConfirmDelete(false)} style={styles.confirmBtn}>
-              <Typography variant="medium" size="xs" color={theme.colors.text.secondary}>Não</Typography>
+              <Typography variant="medium" size="xs" color={theme.colors.text.secondary}>
+                Não
+              </Typography>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => { setConfirmDelete(false); onDelete?.(); }}
+              onPress={() => {
+                setConfirmDelete(false);
+                onDelete?.();
+              }}
               style={[styles.confirmBtn, styles.confirmBtnDanger]}
             >
-              <Typography variant="medium" size="xs" color={theme.colors.text.primary}>Sim, excluir</Typography>
+              <Typography variant="medium" size="xs" color={theme.colors.text.primary}>
+                Sim, excluir
+              </Typography>
             </TouchableOpacity>
           </View>
         </View>
@@ -114,9 +136,17 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: theme.spacing.md,
   },
-  headerText: { flex: 1, marginRight: theme.spacing.sm },
-  actions: { flexDirection: 'row', gap: theme.spacing.sm },
-  actionBtn: { padding: 6 },
+  headerText: {
+    flex: 1,
+    marginRight: theme.spacing.sm,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+  },
+  actionBtn: {
+    padding: 6,
+  },
   progressTextRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -129,8 +159,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     overflow: 'hidden',
   },
-  progressBarFill: { height: '100%', borderRadius: 5 },
-  overLimitText: { marginTop: theme.spacing.sm },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 5,
+  },
+  overLimitText: {
+    marginTop: theme.spacing.sm,
+  },
   confirmRow: {
     marginTop: theme.spacing.sm,
     paddingTop: theme.spacing.sm,
@@ -140,7 +175,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  confirmActions: { flexDirection: 'row', gap: theme.spacing.sm },
+  confirmActions: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+  },
   confirmBtn: {
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: 4,

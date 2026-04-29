@@ -1,24 +1,29 @@
-import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
-import axios from "axios";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+/**
+ * Form edição consumo similar create, com payload diff only changed fields.
+ * Date parse/format helpers.
+ */
 
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
-import { Typography } from "@/components/ui/Typography";
-import { DatePickerInput } from "@/components/ui/DatePickerInput";
-import { SelectInput } from "@/components/ui/SelectInput";
-import { theme } from "@/config/Theme";
-import { descriptionCache } from "@/config/DescriptionCache";
+import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import axios from 'axios';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { Typography } from '@/components/ui/Typography';
+import { DatePickerInput } from '@/components/ui/DatePickerInput';
+import { SelectInput } from '@/components/ui/SelectInput';
+import { theme } from '@/config/Theme';
+import { descriptionCache } from '@/config/DescriptionCache';
 import {
   editConsumptionSchema,
   EditConsumptionFormData,
   ConsumptionRecord,
   parseApiDate,
   formatDateToApi,
-} from "../schemas/ConsumptionSchema";
-import { editConsumo, EntryType } from "../services/ConsumptionService";
+} from '../schemas/ConsumptionSchema';
+import { editConsumo, EntryType } from '../services/ConsumptionService';
 
 interface Props {
   type: EntryType;
@@ -28,25 +33,29 @@ interface Props {
 }
 
 const UNIT_OPTIONS = [
-  { label: "Energia (kWh)", value: "kWh"    },
-  { label: "Água (L)",      value: "L"      },
-  { label: "Gás (m³)",      value: "m³"     },
-  { label: "Dinheiro (R$)", value: "R$"     },
-  { label: "Outros...",     value: "custom" },
+  { label: 'Energia (kWh)', value: 'kWh' },
+  { label: 'Água (L)', value: 'L' },
+  { label: 'Gás (m³)', value: 'm³' },
+  { label: 'Dinheiro (R$)', value: 'R$' },
+  { label: 'Outros...', value: 'custom' },
 ];
 
 export function EditConsumptionForm({ type, record, onSuccess, onCancel }: Props) {
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMsg, setErrorMsg]   = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const { control, handleSubmit, formState: { errors } } = useForm<EditConsumptionFormData>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<EditConsumptionFormData>({
     resolver: zodResolver(editConsumptionSchema),
     defaultValues: {
-      description:         record.description ?? "",
-      starting_date:       parseApiDate(record.starting_date),
-      ending_date:         parseApiDate(record.ending_date),
+      description: record.description ?? '',
+      starting_date: parseApiDate(record.starting_date),
+      ending_date: parseApiDate(record.ending_date),
       si_measurement_unit: record.si_measurement_unit,
-      value:               String(record.value),
+      value: String(record.value),
     },
   });
 
@@ -55,10 +64,18 @@ export function EditConsumptionForm({ type, record, onSuccess, onCancel }: Props
     setErrorMsg(null);
     try {
       const payload = {
-        ...(data.starting_date       && { new_starting_date:        formatDateToApi(data.starting_date) }),
-        ...(data.ending_date         && { new_ending_date:          formatDateToApi(data.ending_date)   }),
-        ...(data.si_measurement_unit && { new_si_measurement_unit:  data.si_measurement_unit            }),
-        ...(data.value               && { new_value:                Number(data.value.replace(",", ".")) }),
+        ...(data.starting_date && {
+          new_starting_date: formatDateToApi(data.starting_date),
+        }),
+        ...(data.ending_date && {
+          new_ending_date: formatDateToApi(data.ending_date),
+        }),
+        ...(data.si_measurement_unit && {
+          new_si_measurement_unit: data.si_measurement_unit,
+        }),
+        ...(data.value && {
+          new_value: Number(data.value.replace(',', '.')),
+        }),
       };
 
       const response = await editConsumo(type, record.id, payload);
@@ -70,7 +87,7 @@ export function EditConsumptionForm({ type, record, onSuccess, onCancel }: Props
       onSuccess();
     } catch (error) {
       const detail = axios.isAxiosError(error) ? error.response?.data?.detail : null;
-      setErrorMsg(typeof detail === "string" ? detail : "Erro ao atualizar.");
+      setErrorMsg(typeof detail === 'string' ? detail : 'Erro ao atualizar.');
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +102,7 @@ export function EditConsumptionForm({ type, record, onSuccess, onCancel }: Props
           <Input
             label="Identificador (Opcional)"
             placeholder="Ex: Conta de casa, Chuveiro..."
-            value={field.value ?? ""}
+            value={field.value ?? ''}
             onChangeText={field.onChange}
             error={errors.description?.message}
           />
@@ -99,7 +116,7 @@ export function EditConsumptionForm({ type, record, onSuccess, onCancel }: Props
           <SelectInput
             label="Unidade"
             options={UNIT_OPTIONS}
-            value={field.value ?? ""}
+            value={field.value ?? ''}
             onSelect={field.onChange}
             error={errors.si_measurement_unit?.message}
           />
@@ -159,15 +176,32 @@ export function EditConsumptionForm({ type, record, onSuccess, onCancel }: Props
         </Typography>
       )}
 
-      <Button title="Salvar Alterações" onPress={handleSubmit(onSubmit)} isLoading={isLoading} style={styles.btn} />
+      <Button
+        title="Salvar Alterações"
+        onPress={handleSubmit(onSubmit)}
+        isLoading={isLoading}
+        style={styles.btn}
+      />
       <Button title="Cancelar" variant="outline" onPress={onCancel} style={styles.btn} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { width: "100%", paddingVertical: theme.spacing.sm },
-  row:       { flexDirection: "row" },
-  errorText: { color: theme.colors.danger.main, textAlign: "center", marginBottom: theme.spacing.sm },
-  btn:       { width: "100%", marginTop: theme.spacing.sm },
+  container: {
+    width: '100%',
+    paddingVertical: theme.spacing.sm,
+  },
+  row: {
+    flexDirection: 'row',
+  },
+  errorText: {
+    color: theme.colors.danger.main,
+    textAlign: 'center',
+    marginBottom: theme.spacing.sm,
+  },
+  btn: {
+    width: '100%',
+    marginTop: theme.spacing.sm,
+  },
 });

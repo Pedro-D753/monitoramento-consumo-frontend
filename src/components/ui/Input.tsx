@@ -1,3 +1,9 @@
+/**
+ * Input flutuante animado com label, suporte a password toggle e error state.
+ * Usa Animated para transições suaves da label.
+ * ForwardRef para ref forwarding.
+ */
+
 import { useState, useRef, useEffect, forwardRef } from "react";
 import {
   View,
@@ -12,11 +18,18 @@ import { Feather } from "@expo/vector-icons";
 import { theme } from "@/config/Theme";
 
 interface InputProps extends TextInputProps {
+  /** Label flutuante opcional */
   label?: string;
+  /** Mensagem de erro exibida abaixo */
   error?: string;
+  /** Modo senha com toggle visibility */
   isPassword?: boolean;
 }
 
+/**
+ * Input principal com animações e estados visuais.
+ * Sincroniza label com focus/value via Animated.Value.
+ */
 export const Input = forwardRef<TextInput, InputProps>(
   (
     {
@@ -37,7 +50,7 @@ export const Input = forwardRef<TextInput, InputProps>(
     const animatedValue = useRef(new Animated.Value(value ? 1 : 0)).current;
 
     useEffect(() => {
-      // Mantém a label flutuante sincronizada com foco e conteúdo.
+      // Anima label baseado em focus ou value presente
       Animated.timing(animatedValue, {
         toValue: isFocused || !!value ? 1 : 0,
         duration: 150,
@@ -70,13 +83,13 @@ export const Input = forwardRef<TextInput, InputProps>(
           : isFocused
             ? theme.colors.primary.main
             : theme.colors.text.neutral,
-       ],
-     });
+      ],
+    });
 
     return (
       <View style={[styles.wrapper, { opacity: isDisabled ? 0.5 : 1 }]}>
         <View style={[styles.inputContainer, { borderColor }]}>
-            {label && (
+          {label && (
             <Animated.Text
               pointerEvents="none"
               style={[
@@ -128,7 +141,7 @@ export const Input = forwardRef<TextInput, InputProps>(
   },
 );
 
-Input.displayName = 'Input';
+Input.displayName = "Input";
 
 const styles = StyleSheet.create({
   wrapper: {

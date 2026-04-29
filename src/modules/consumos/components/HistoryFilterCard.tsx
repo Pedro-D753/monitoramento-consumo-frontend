@@ -1,3 +1,8 @@
+/**
+ * Card filtro histórico com dates/unit select.
+ * Apply/clear buttons.
+ */
+
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { DatePickerInput } from '@/components/ui/DatePickerInput';
@@ -71,19 +76,14 @@ export function HistoryFilterCard({
       />
 
       <View style={styles.buttonArea}>
-        <Button 
-          title="Limpar" 
+        <Button
+          title="Limpar"
           variant="outline"
           isLoading={isLoading}
-          style={styles.button} 
-          onPress={onClear} 
+          style={styles.button}
+          onPress={onClear}
         />
-        <Button 
-          title="Aplicar" 
-          isLoading={isLoading}
-          style={styles.button} 
-          onPress={onApply} 
-        />
+        <Button title="Aplicar" isLoading={isLoading} style={styles.button} onPress={onApply} />
       </View>
     </View>
   );

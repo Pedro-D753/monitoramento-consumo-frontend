@@ -1,32 +1,43 @@
+/**
+ * Componente tipográfico escalável com variants de font, size, lineHeight.
+ * Integra theme para consistência visual.
+ * Suporte a hyphenation/break strategy para texto longo.
+ */
+
 import React from "react";
 import { Text, TextProps, TextStyle } from "react-native";
 import { theme } from "@/config/Theme";
 
 interface TypographyProps extends TextProps {
-  variant?:    keyof typeof theme.fonts;
-  size?:       keyof typeof theme.fontSizes;
+  /** Variante da fonte (regular, medium, bold) */
+  variant?: keyof typeof theme.fonts;
+  /** Tamanho da fonte */
+  size?: keyof typeof theme.fontSizes;
+  /** Altura da linha */
   lineHeight?: keyof typeof theme.lineHeights;
-  color?:      string;
-  align?:      TextStyle['textAlign'];
-  hyphenate?:  boolean;
+  /** Cor customizada */
+  color?: string;
+  /** Alinhamento texto */
+  align?: TextStyle["textAlign"];
+  /** Hifenização/quebra de palavras */
+  hyphenate?: boolean;
 }
 
 export function Typography({
-  variant    = "regular",
-  size       = "md",
+  variant = "regular",
+  size = "md",
   lineHeight = "normal",
   color,
-  align      = "left",
-  hyphenate  = false,
+  align = "left",
+  hyphenate = false,
   style,
   children,
   ...rest
 }: TypographyProps) {
-  const fontSize            = theme.fontSizes[size];
+  const fontSize = theme.fontSizes[size];
   const calculatedLineHeight = fontSize * theme.lineHeights[lineHeight];
 
-  // ✅ Bug #13: hyphenationFactor não existe no RN — removido.
-  // textBreakStrategy funciona no Android para melhorar quebra de palavras.
+  // Props para quebra de palavras otimizada (Android)
   const hyphenationProps = hyphenate
     ? { textBreakStrategy: "balanced" as const }
     : {};
@@ -36,11 +47,11 @@ export function Typography({
       {...hyphenationProps}
       style={[
         {
-          fontFamily:  theme.fonts[variant],
+          fontFamily: theme.fonts[variant],
           fontSize,
-          lineHeight:  calculatedLineHeight,
-          color:       color || theme.colors.text.primary,
-          textAlign:   align,
+          lineHeight: calculatedLineHeight,
+          color: color || theme.colors.text.primary,
+          textAlign: align,
         },
         style,
       ]}

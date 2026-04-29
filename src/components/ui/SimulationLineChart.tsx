@@ -1,22 +1,34 @@
-import React from 'react';
-import { useWindowDimensions } from 'react-native';
-import { LineChart } from 'react-native-gifted-charts';
-import { ChartDataPoint } from '@/modules/consumos/schemas/ConsumptionSchema';
-import { theme } from '@/config/Theme';
-import { ChartContainer } from './ChartContainer';
+/**
+ * LineChart simulação tendência com gifted-charts.
+ * Curved area fill animated.
+ * Responsive.
+ */
+
+import React from "react";
+import { useWindowDimensions } from "react-native";
+import { LineChart } from "react-native-gifted-charts";
+import { ChartDataPoint } from "@/modules/consumos/schemas/ConsumptionSchema";
+import { theme } from "@/config/Theme";
+import { ChartContainer } from "./ChartContainer";
 
 interface SimulationLineChartProps {
+  /** Dados linha */
   data: ChartDataPoint[];
+  /** Loading */
   isLoading?: boolean;
 }
 
-export function SimulationLineChart({ data, isLoading }: SimulationLineChartProps) {
-  // ✅ Bug #5: useWindowDimensions reativo (reagia a rotação/split-screen)
+export function SimulationLineChart({
+  data,
+  isLoading,
+}: SimulationLineChartProps) {
   const { width } = useWindowDimensions();
-  const isEmpty   = data.length === 0;
+  const isEmpty = data.length === 0;
 
-  // Remove frontColor dos itens: é prop exclusiva do BarChart
-  const lineData = data.map(({ frontColor: _fc, dataPointColor: _dc, ...rest }) => rest);
+  // Remove props incompatíveis com LineChart
+  const lineData = data.map(
+    ({ frontColor: _fc, dataPointColor: _dc, ...rest }) => rest,
+  );
 
   return (
     <ChartContainer
@@ -45,7 +57,10 @@ export function SimulationLineChart({ data, isLoading }: SimulationLineChartProp
         yAxisThickness={0}
         xAxisColor={theme.colors.border}
         yAxisTextStyle={{ color: theme.colors.text.secondary, fontSize: 12 }}
-        xAxisLabelTextStyle={{ color: theme.colors.text.primary, fontSize: 12 }}
+        xAxisLabelTextStyle={{
+          color: theme.colors.text.primary,
+          fontSize: 12,
+        }}
         isAnimated
         animationDuration={800}
       />

@@ -1,30 +1,40 @@
+/**
+ * BarChart histórico consumo com gifted-charts.
+ * Responsive width.
+ * Animated labels.
+ */
 
-import React from 'react';
-import { useWindowDimensions } from 'react-native';
-import { BarChart } from 'react-native-gifted-charts';
-import { ChartDataPoint } from '@/modules/consumos/schemas/ConsumptionSchema';
-import { theme } from '@/config/Theme';
-import { ChartContainer } from './ChartContainer';
+import React from "react";
+import { useWindowDimensions } from "react-native";
+import { BarChart } from "react-native-gifted-charts";
+import { ChartDataPoint } from "@/modules/consumos/schemas/ConsumptionSchema";
+import { theme } from "@/config/Theme";
+import { ChartContainer } from "./ChartContainer";
 
 interface ConsumptionBarChartProps {
+  /** Dados pontos chart */
   data: ChartDataPoint[];
+  /** Loading */
   isLoading?: boolean;
 }
 
-export function ConsumptionBarChart({ data, isLoading }: ConsumptionBarChartProps) {
+export function ConsumptionBarChart({
+  data,
+  isLoading,
+}: ConsumptionBarChartProps) {
   const { width } = useWindowDimensions();
   const isEmpty = data.length === 0;
 
-  const chartWidth = width - 130
+  const chartWidth = width - 130;
 
   return (
-    <ChartContainer 
-      title="Histórico de Consumo" 
+    <ChartContainer
+      title="Histórico de Consumo"
       subtitle="Últimos meses registrados"
       isLoading={isLoading}
       isEmpty={isEmpty}
     >
-<BarChart
+      <BarChart
         data={data}
         width={chartWidth}
         height={180}
@@ -33,14 +43,21 @@ export function ConsumptionBarChart({ data, isLoading }: ConsumptionBarChartProp
         hideRules
         xAxisThickness={1}
         yAxisThickness={0}
-        yAxisLabelWidth={20} // <-- ESSENCIAL: Impede que os números na esquerda empurrem o gráfico pra fora
+        yAxisLabelWidth={20}
         xAxisColor={theme.colors.border}
         yAxisTextStyle={{ color: theme.colors.text.secondary, fontSize: 12 }}
-        xAxisLabelTextStyle={{ color: theme.colors.text.primary, fontSize: 12 }}
+        xAxisLabelTextStyle={{
+          color: theme.colors.text.primary,
+          fontSize: 12,
+        }}
         barBorderRadius={4}
         isAnimated
         animationDuration={600}
-        topLabelTextStyle={{ color: theme.colors.text.primary, fontSize: 10, marginBottom: 4 }}
+        topLabelTextStyle={{
+          color: theme.colors.text.primary,
+          fontSize: 10,
+          marginBottom: 4,
+        }}
       />
     </ChartContainer>
   );

@@ -1,23 +1,33 @@
+/**
+ * Container para gráficos com loading/empty states.
+ * Header title/subtitle.
+ * Altura mínima evita layout shift.
+ */
 
-import React from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { Typography } from './Typography';
-import { theme } from '@/config/Theme';
+import React from "react";
+import { View, StyleSheet, ActivityIndicator } from "react-native";
+import { Typography } from "./Typography";
+import { theme } from "@/config/Theme";
 
 interface ChartContainerProps {
+  /** Título chart */
   title: string;
+  /** Subtítulo opcional */
   subtitle?: string;
+  /** Loading spinner */
   isLoading?: boolean;
+  /** Estado vazio */
   isEmpty?: boolean;
-  children: React.ReactNode; // É aqui que o gráfico real será "injetado"
+  /** Conteúdo gráfico */
+  children: React.ReactNode;
 }
 
-export function ChartContainer({ 
-    title, 
-    subtitle, 
-    isLoading = false, 
-    isEmpty = false,
-    children 
+export function ChartContainer({
+  title,
+  subtitle,
+  isLoading = false,
+  isEmpty = false,
+  children,
 }: ChartContainerProps) {
   return (
     <View style={styles.card}>
@@ -26,7 +36,11 @@ export function ChartContainer({
           {title}
         </Typography>
         {subtitle && (
-          <Typography variant="regular" size="sm" color={theme.colors.text.secondary}>
+          <Typography
+            variant="regular"
+            size="sm"
+            color={theme.colors.text.secondary}
+          >
             {subtitle}
           </Typography>
         )}
@@ -36,7 +50,11 @@ export function ChartContainer({
         {isLoading ? (
           <ActivityIndicator size="large" color={theme.colors.primary.main} />
         ) : isEmpty ? (
-          <Typography variant="regular" align="center" color={theme.colors.text.disabled}>
+          <Typography
+            variant="regular"
+            align="center"
+            color={theme.colors.text.disabled}
+          >
             Nenhum dado disponível para este período.
           </Typography>
         ) : (
@@ -53,17 +71,17 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.md,
     padding: theme.spacing.md,
     marginBottom: theme.spacing.lg,
-    width: '100%',
+    width: "100%",
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
   header: {
-    marginBottom: theme.spacing.lg, // Espaço para a legenda do gráfico não encostar
+    marginBottom: theme.spacing.lg,
   },
   content: {
-    minHeight: 220, // Altura mínima fixa evita o temido "Layout Shift" (a tela pulando quando o loading acaba)
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-  }
+    minHeight: 220,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+  },
 });
