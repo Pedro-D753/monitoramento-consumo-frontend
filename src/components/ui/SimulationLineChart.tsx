@@ -1,34 +1,30 @@
-/**
- * LineChart simulação tendência com gifted-charts.
- * Curved area fill animated.
- * Responsive.
- */
-
-import React from "react";
-import { useWindowDimensions } from "react-native";
-import { LineChart } from "react-native-gifted-charts";
-import { ChartDataPoint } from "@/modules/consumos/schemas/ConsumptionSchema";
-import { theme } from "@/config/Theme";
-import { ChartContainer } from "./ChartContainer";
+import React from 'react';
+import { useWindowDimensions } from 'react-native';
+import { LineChart } from 'react-native-gifted-charts';
+import { ChartDataPoint } from '@/modules/consumos/schemas/ConsumptionSchema';
+import { theme } from '@/config/Theme';
+import { ChartContainer } from './ChartContainer';
 
 interface SimulationLineChartProps {
-  /** Dados linha */
   data: ChartDataPoint[];
-  /** Loading */
   isLoading?: boolean;
 }
 
-export function SimulationLineChart({
-  data,
-  isLoading,
-}: SimulationLineChartProps) {
+export function SimulationLineChart({ data, isLoading }: SimulationLineChartProps) {
   const { width } = useWindowDimensions();
   const isEmpty = data.length === 0;
 
-  // Remove props incompatíveis com LineChart
-  const lineData = data.map(
-    ({ frontColor: _fc, dataPointColor: _dc, ...rest }) => rest,
-  );
+  // 1. Largura calculada idêntica à do BarChart
+  const chartWidth = width - 130;
+
+  // Remove propriedades incompatíveis com o LineChart
+  const lineData = data.map(({ frontColor: _fc, dataPointColor: _dc, ...rest }) => rest);
+
+  // 2. Força um espaçamento mínimo de 60px para ativar o scroll nativo da biblioteca
+  const pointsCount = lineData.length;
+  const dynamicSpacing = pointsCount > 1 
+    ? Math.max(60, (chartWidth - 40) / (pointsCount - 1))
+    : 60;
 
   return (
     <ChartContainer
@@ -39,8 +35,13 @@ export function SimulationLineChart({
     >
       <LineChart
         data={lineData}
-        width={width - 80}
+        width={chartWidth}
         height={180}
+        
+        yAxisLabelWidth={20} 
+        initialSpacing={20}
+        endSpacing={20}
+        
         curved
         curvature={0.2}
         color={theme.colors.primary.light}
@@ -57,10 +58,7 @@ export function SimulationLineChart({
         yAxisThickness={0}
         xAxisColor={theme.colors.border}
         yAxisTextStyle={{ color: theme.colors.text.secondary, fontSize: 12 }}
-        xAxisLabelTextStyle={{
-          color: theme.colors.text.primary,
-          fontSize: 12,
-        }}
+        xAxisLabelTextStyle={{ color: theme.colors.text.primary, fontSize: 12 }}
         isAnimated
         animationDuration={800}
       />

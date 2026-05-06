@@ -11,6 +11,7 @@ export interface EditConsumptionPayload {
   new_ending_date?: string;
   new_si_measurement_unit?: string;
   new_value?: number;
+  new_description?: string;
 }
 
 export type EntryType = "real" | "simulation" | "goal";
@@ -64,11 +65,7 @@ export const createConsumo = async (
   type: EntryType,
   data: CreateConsumptionPayload,
 ): Promise<ConsumptionRecord> => {
-  // ✅ Bug #7: description é armazenada localmente — nunca enviada para a API
-  // Evita 422 se o backend tiver extra='forbid' no schema Pydantic
-  const { description: _localOnly, ...apiPayload } =
-    data as CreateConsumptionPayload & { description?: string };
-
-  const response = await api.post<ConsumptionRecord>(ENDPOINT_MAP[type], apiPayload);
+  
+  const response = await api.post<ConsumptionRecord>(ENDPOINT_MAP[type], data);
   return response.data;
 };

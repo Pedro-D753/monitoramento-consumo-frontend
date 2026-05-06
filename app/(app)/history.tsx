@@ -14,7 +14,11 @@ import { theme } from '@/config/Theme';
 import { ViewSelector, ViewType } from '@/components/ui/ViewSelector';
 import { getUnitLabel } from '@/modules/consumos/utils/UnitUtils';
 import { useConsumptionHistory } from '@/modules/consumos/hooks/UseConsumptionHistory';
-import { ConsumptionRecord, formatDateToApi, parseApiDate } from '@/modules/consumos/schemas/ConsumptionSchema';
+import {
+  ConsumptionRecord,
+  formatDateToApi,
+  parseApiDate,
+} from '@/modules/consumos/schemas/ConsumptionSchema';
 import { EditConsumptionForm } from '@/modules/consumos/components/EditConsumptionForm';
 import { HistoryFilterCard } from '@/modules/consumos/components/HistoryFilterCard';
 import { deleteConsumo } from '@/modules/consumos/services/ConsumptionService';
@@ -68,7 +72,7 @@ export default function HistoryScreen() {
     setStartDate(undefined);
     setEndDate(undefined);
     setUnit('');
-    
+
     // 2. Avisa ao Hook de consumos para remover qualquer filtro aplicado
     applyLocalFilters({});
   };
@@ -76,7 +80,6 @@ export default function HistoryScreen() {
   return (
     <>
       <PageLayout showHeader={false}>
-
         <ViewSelector activeView="history" onSelect={handleViewChange} />
 
         <TouchableOpacity
@@ -88,7 +91,9 @@ export default function HistoryScreen() {
         </TouchableOpacity>
 
         <View style={styles.headerContainer}>
-          <Typography variant="bold" size="xl">Histórico Completo</Typography>
+          <Typography variant="bold" size="xl">
+            Histórico Completo
+          </Typography>
         </View>
 
         <View style={styles.chartArea}>
@@ -96,29 +101,41 @@ export default function HistoryScreen() {
             <Typography variant="bold" size="md">
               {chartType === 'bar' ? 'Volume de Consumo' : 'Tendência de Consumo'}
             </Typography>
+            
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setChartType((prev) => (prev === 'bar' ? 'line' : 'bar'))}
+              style={{ 
+                flexDirection: 'row', 
+                alignItems: 'center', 
+                gap: 6, 
+                backgroundColor: theme.colors.card.subCard, 
+                paddingHorizontal: 12, 
+                paddingVertical: 6, 
+                borderRadius: 16, 
+                borderWidth: 1, 
+                borderColor: theme.colors.border 
+              }}
+            >
+              <Feather 
+                name={chartType === 'bar' ? 'bar-chart-2' : 'activity'} 
+                size={14} 
+                color={theme.colors.primary.main} 
+              />
+              <Typography variant="medium" size="xs" color={theme.colors.primary.main}>
+                Alternar
+              </Typography>
+            </TouchableOpacity>
           </View>
-          <Typography
-            variant="regular"
-            size="xs"
-            color={theme.colors.primary.main}
-            style={styles.chartHint}
-          >
-            (Toque no gráfico para alterar)
-          </Typography>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => setChartType((prev) => (prev === 'bar' ? 'line' : 'bar'))}
-            style={styles.chartTouchable}
-          >
+
+          <View style={styles.chartTouchable}>
             {chartType === 'bar' ? (
-              // Simples e limpo. A variável data já está formatada pelo hook!
               <ConsumptionBarChart data={data} isLoading={isLoading} />
             ) : (
               <SimulationLineChart data={data} isLoading={isLoading} />
             )}
-          </TouchableOpacity>
+          </View>
         </View>
-
         <HistoryFilterCard
           startDate={startDate}
           endDate={endDate}

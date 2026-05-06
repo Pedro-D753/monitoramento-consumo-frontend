@@ -48,7 +48,7 @@ export function BottomSheetModal({
       Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
 
     const onShow = (e: KeyboardEvent) =>
-      setKeyboardOffset(e.endCoordinates.height);
+      setKeyboardOffset(e.endCoordinates.height - 100);
     const onHide = () => setKeyboardOffset(0);
 
     const showSub = Keyboard.addListener(showEvent, onShow);

@@ -2,7 +2,6 @@ import { useState, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { useFocusEffect } from 'expo-router';
 import { ConsumptionRecord } from '../schemas/ConsumptionSchema';
-import { descriptionCache } from '@/config/DescriptionCache';
 import {
   getConsumos,
   deleteConsumo,
@@ -29,7 +28,6 @@ export function useEntries(type: EntryType): UseEntriesResult {
 
   const fetchEntries = useCallback(async (force = false) => {
     const now = Date.now();
-    // ✅ Bug #9: Ignora re-fetch se os dados ainda são "frescos" e não é forçado
     if (!force && now - lastFetchRef.current < STALE_MS && entries.length > 0) {
       setIsLoading(false);
       return;
@@ -38,15 +36,8 @@ export function useEntries(type: EntryType): UseEntriesResult {
     try {
       setIsLoading(true);
       const data = await getConsumos(type);
-
-      // ✅ Bug #16: Usa o singleton descriptionCache em vez de chamar storage diretamente
-      const localDescriptions = await descriptionCache.getAll();
-      const mergedData = data.map((item) => ({
-        ...item,
-        description: localDescriptions[item.id] || item.description,
-      }));
-
-      setEntries(mergedData);
+      
+      setEntries(data);
       lastFetchRef.current = Date.now();
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 404) {
@@ -75,17 +66,11 @@ export function useEntries(type: EntryType): UseEntriesResult {
     async (id: number, payload: EditConsumptionPayload): Promise<ConsumptionRecord> => {
       const updated = await editConsumo(type, id, payload);
 
-      // Re-aplica a descrição local para não desaparecer após a edição
-      const localDescriptions = await descriptionCache.getAll();
-      const mergedUpdated = {
-        ...updated,
-        description: localDescriptions[updated.id] || updated.description,
-      };
-
       setEntries((prev) =>
-        prev.map((entry) => (entry.id === id ? mergedUpdated : entry)),
+        prev.map((entry) => (entry.id === id ? updated : entry)),
       );
-      return mergedUpdated;
+      
+      return updated;
     },
     [type],
   );

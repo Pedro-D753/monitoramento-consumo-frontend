@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderWidth: 1,
     borderColor: theme.colors.border,
+    overflow: "hidden",
   },
   header: {
     marginBottom: theme.spacing.lg,

@@ -16,7 +16,6 @@ import { Typography } from '@/components/ui/Typography';
 import { DatePickerInput } from '@/components/ui/DatePickerInput';
 import { SelectInput } from '@/components/ui/SelectInput';
 import { theme } from '@/config/Theme';
-import { descriptionCache } from '@/config/DescriptionCache';
 import {
   createConsumptionSchema,
   CreateConsumptionFormInput,
@@ -56,15 +55,7 @@ export function CreateConsumptionForm({ type = 'real', onSuccess }: Props) {
     setIsLoading(true);
     setErrorMsg(null);
     try {
-      const response = await createConsumo(type, data);
-
-      // Cache descrição local
-      const description = (data as CreateConsumptionFormOutput & { description?: string })
-        .description;
-      if (description) {
-        await descriptionCache.save(response.id, description);
-      }
-
+      await createConsumo(type, data);
       onSuccess();
     } catch (error) {
       if (axios.isAxiosError(error)) {

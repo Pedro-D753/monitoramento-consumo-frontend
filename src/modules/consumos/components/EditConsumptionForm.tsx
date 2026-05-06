@@ -15,7 +15,6 @@ import { Typography } from '@/components/ui/Typography';
 import { DatePickerInput } from '@/components/ui/DatePickerInput';
 import { SelectInput } from '@/components/ui/SelectInput';
 import { theme } from '@/config/Theme';
-import { descriptionCache } from '@/config/DescriptionCache';
 import {
   editConsumptionSchema,
   EditConsumptionFormData,
@@ -64,26 +63,15 @@ export function EditConsumptionForm({ type, record, onSuccess, onCancel }: Props
     setErrorMsg(null);
     try {
       const payload = {
-        ...(data.starting_date && {
-          new_starting_date: formatDateToApi(data.starting_date),
-        }),
-        ...(data.ending_date && {
-          new_ending_date: formatDateToApi(data.ending_date),
-        }),
-        ...(data.si_measurement_unit && {
-          new_si_measurement_unit: data.si_measurement_unit,
-        }),
-        ...(data.value && {
-          new_value: Number(data.value.replace(',', '.')),
-        }),
+        ...(data.starting_date && { new_starting_date: formatDateToApi(data.starting_date) }),
+        ...(data.ending_date && { new_ending_date: formatDateToApi(data.ending_date) }),
+        ...(data.si_measurement_unit && { new_si_measurement_unit: data.si_measurement_unit }),
+        ...(data.value && { new_value: Number(data.value.replace(",", ".")) }),
+        // ✅ NOVO: Envia a descrição atualizada (mesmo se o usuário apagar o texto, enviamos vazio)
+        ...(data.description !== undefined && { new_description: data.description }),
       };
 
-      const response = await editConsumo(type, record.id, payload);
-
-      if (data.description) {
-        await descriptionCache.save(response.id, data.description);
-      }
-
+      await editConsumo(type, record.id, payload);
       onSuccess();
     } catch (error) {
       const detail = axios.isAxiosError(error) ? error.response?.data?.detail : null;

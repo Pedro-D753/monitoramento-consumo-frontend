@@ -4,8 +4,6 @@ import axios from 'axios';
 import { useAuth } from '@/modules/auth/context/AuthContext';
 import { updateUser, deleteUser, UserProfile } from '@/modules/auth/services/AuthService';
 import { storage } from '@/config/Storage';
-import { descriptionCache } from '@/config/DescriptionCache';
-
 interface ProfileActionsState {
   // Dados do usuário editável
   user: UserProfile | null;
@@ -103,10 +101,6 @@ export function useProfileActions(): ProfileActionsState {
 
       await deleteUser(refreshToken);
 
-      // Limpa cache de descrições ao excluir conta
-      descriptionCache.invalidate();
-
-      // ✅ Bug #4: signOut local (conta já não existe no server) + redirect obrigatório
       await signOut(true);
       router.replace('/(auth)/sign-in');
     } catch (error) {
@@ -123,7 +117,6 @@ export function useProfileActions(): ProfileActionsState {
   }, [signOut, router]);
 
   const handleLogout = useCallback(async () => {
-    descriptionCache.invalidate();
     await signOut();
     router.replace('/(auth)/sign-in');
   }, [signOut, router]);

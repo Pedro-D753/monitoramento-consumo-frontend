@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { useFocusEffect } from "expo-router";
 import axios from "axios";
-import { descriptionCache } from "@/config/DescriptionCache";
 import {
   ConsumptionRecord,
   ChartDataPoint,
@@ -33,15 +32,11 @@ export function useConsumptionHistory() {
 
     try {
       const raw = await getConsumos("real");
-      const localDescriptions = await descriptionCache.getAll();
-      const mergedData = raw.map((item) => ({
-        ...item,
-        description: localDescriptions[item.id] || item.description,
-      }));
-
-      setCachedData(mergedData);
-      setFilteredData(mergedData);
-      setChartData(formatToMonthlyChartData(mergedData));
+      
+      setCachedData(raw);
+      setFilteredData(raw);
+      setChartData(formatToMonthlyChartData(raw));
+      
       lastFetchRef.current = Date.now();
     } catch (err) {
       if (axios.isAxiosError(err)) {
